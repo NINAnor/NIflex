@@ -1,16 +1,16 @@
 
-selectDropIndices <- function(mode = "pre-defined", OutputType = NULL, ecosystem = NULL, customList = NULL){
+selectDropIndices <- function(DropIdxMode = "pre-defined", OutputType = NULL, ecosystem = NULL, customList = NULL){
   
   ## Check for validity of argument combinations
-  if(!(mode %in% c("pre-defined", "custom"))){
+  if(!(DropIdxMode %in% c("pre-defined", "custom"))){
     stop("Invalid Mode specified. The supported options are 'pre-defined' and 'custom'.")
   }
   
-  if(mode == "custom" & is.null(customList)){
-    stop("customList missing. When running mode = 'custom', a list of indicator id's has to be provided via the argumen 'customList'.")
+  if(DropIdxMode == "custom" & is.null(customList)){
+    stop("customList missing. When running DropIdxMode = 'custom', a list of indicator id's has to be provided via the argumen 'customList'.")
   }
   
-  if(OutputType %in% c("ThematicIndex", "CustomIndex") & mode == "custom"){
+  if(OutputType %in% c("ThematicIndex", "CustomIndex") & DropIdxMode == "custom"){
     warning("You have specified additional indices to drop from a custom or thematic index. This may not be what you intended.")
   }
   
@@ -19,7 +19,7 @@ selectDropIndices <- function(mode = "pre-defined", OutputType = NULL, ecosystem
   # TODO: Update exclusions for Nature Index prior to 2025 update
   # TODO: Update exclusions for Ecological condition after discussions with Anders
   
-  if(mode == "custom"){
+  if(DropIdxMode == "custom"){
     
     DropIndices <- customList
     
