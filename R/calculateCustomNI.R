@@ -5,6 +5,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
                               KeyIndicators, KeyWeight, 
                               AreaWeights, TrophicWeights,
                               NAImputation, years, OutputType,
+                              funArguments = NULL,
                               Diagnostics, TestRun,
                               norwegianNames = TRUE, saveSteps = TRUE){
   
@@ -29,8 +30,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   
   ## Import data
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
-    # TODO: Add 2-step data import for ecosystems "Hav" and "Kystvann"
-    
+
     if(ecosystem %in% c("Kystvann", "Hav")){
       
       ecosystem_part <- c(ifelse(ecosystem == "Kystvann", "Kystvann-bunn", "Havbunn"),
@@ -96,10 +96,18 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
 
   ## Thematic index data assembly
   if(OutputType == "ThematicIndex"){
-    stop("NiObject assembly for for thematic indices has not been streamlined yet")
-    # TODO: Write assembleNiObject() call for thematic indices. Function arguments
-    # vary among thematic indices, and the specific combinations need to be 
-    # programmed in a helper function. 
+    
+    if(is.null(funArguments)){
+      stop("NiObject assembly for for thematic indices requires additional function arguments that have to be specified via 'funArguments'.")
+    }
+    
+    NIObject <- assembleNiObject(inputData = importData,
+                                 predefNIunits = funArguments$predefNIunits,
+                                 indexType = funArguments$indexType,
+                                 part = funArguments$part,
+                                 total = funArguments$total,
+                                 partOfTotal = funArguments$partOfTotal)
+    # TODO: Implement special NIunits used for themes AlpinePasserines, Acidification, and Eutrophication
   }
   
   ## Custom index data assembly
@@ -183,8 +191,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
     awBSunit_use <- ecosystem
   }else{
-    # TODO: Allow for feeding in of additional information "awBSunit" to calculateIndex(). 
-    stop("Thematic and custom indices require feeding in of additional information via yet-to-be implemented helper functions. Information required: awBSunit argument for calculateIndex().")
+    awBSunit_use <- funArguments$awBSunit
   }
   
   ## Calculate custom index

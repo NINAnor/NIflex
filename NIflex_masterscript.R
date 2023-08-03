@@ -64,8 +64,8 @@ norwegianNames <- TRUE # Yes
 #norwegianNames <- FALSE # No (English names instead)
 
 ## Output type
-OutputType <- "NatureIndex"
-#OutputType <- "ThematicIndex"
+#OutputType <- "NatureIndex"
+OutputType <- "ThematicIndex"
 #OutputType <- "CustomIndex"
 #OutputType <- "EcologicalCondition"
 
@@ -96,21 +96,40 @@ if(OutputType == "CustomIndex"){
 
 ## Nature Index for Ecological Condition
 if(OutputType == "EcologicalCondition"){
-  EC_ecosystem <- "Forest"
-  #EC_ecosystem <- "Mountain"
-  #EC_ecosystem <- "Wetland"
+  #EC_ecosystem <- c("Forest", "Skog")
+  #EC_ecosystem <- c("Mountain", "Fjell")
+  EC_ecosystem <- c("Wetlands", "Våtmark")
   #IndicatorSet <- listIndicators_NIforEC(ecosystem = EC_ecosystem)  # No longer needed as we'll likely go with an NI + drop indicators approach instead
 }else{
   EC_ecosystem <- NULL
 }
 
 ## Options for dropping indicators
-#DropIdxMode <- "pre-defined"
-#if(DropIdxMode == "pre-defined"){DropIdxList <- NULL}
+DropIdxMode <- "pre-defined"
+if(DropIdxMode == "pre-defined"){DropIdxList <- NULL}
 
-DropIdxMode <- "custom"
-DropIdxList <- c(1, 92, 360)
+#DropIdxMode <- "custom"
+#DropIdxList <- c(1, 92, 360)
 
+## Set function arguments (for thematic and custom indices)
+if(OutputType == "ThematicIndex"){
+  funArguments <- listFunctionArguments(OutputType = OutputType,
+                                        theme = theme)
+}
+
+if(OutputType == "CustomIndex"){
+  funArguments <- listFunctionArguments(OutputType = OutputType,
+                                        predefNIunits = c(allArea = TRUE, parts = TRUE, counties = FALSE), 
+                                        indexType = "thematic", 
+                                        part = "ecosystem", 
+                                        total = "total", 
+                                        partOfTotal = 0,
+                                        awBSunit = "equalWeights")
+}
+
+if(!exists("funArguments")){
+  funArguments <- NULL
+}
 
 ## Diagnostics imputation
 Diagnostics <- TRUE # Yes
@@ -126,16 +145,21 @@ TestRun <- TRUE # Yeas
 #*******************#
 
 ## Set ecosystem name
-if(OutputType == "NatureIndex"){
+if(OutputType %in% "NatureIndex"){
   ecosystem_use <- Ecosystem[2]
+}else{
+  ecosystem_use <- EC_ecosystem[2]
+}
+
+## Assign indicator set
+if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
   indicators_use <- NULL
 }else{
-  ecosystem_use <- EC_ecosystem
   indicators_use <- IndicatorSet
 }
 
 ## Make list of indicators to drop
-dropIdx <- selectDropIndices(mode = DropIdxMode,
+dropIdx <- selectDropIndices(DropIdxMode = DropIdxMode,
                              OutputType = OutputType,
                              ecosystem = ifelse(OutputType %in% c("NatureIndex", "EcologicalCondition"), ecosystem_use, NULL),
                              customList = DropIdxList)
@@ -152,6 +176,7 @@ CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
                               NAImputation = NAImputation,
                               years = years,
                               OutputType = OutputType,
+                              funArguments = funArguments,
                               Diagnostics = Diagnostics,
                               TestRun = TestRun,
                               norwegianNames = norwegianNames,
