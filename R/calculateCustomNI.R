@@ -1,6 +1,7 @@
 
 
 calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None",
+                              dropIdx = NULL,
                               KeyIndicators, KeyWeight, 
                               AreaWeights, TrophicWeights,
                               NAImputation, years, OutputType,
@@ -64,26 +65,12 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   }
 
   ## Selective removal of indicators
-  if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
-    
-    if(ecosystem %in% c("Skog", "Våtmark")){
-      dropIdx <- 155 # (lavhei)
-    }
-    
-    if(ecosystem == "Hav"){
-      dropIdx <- 165 # (sei)
-    }
-    
-    if(exists("dropIdx")){
-      importData$ICunits <- importData$ICunits[importData$ICunits$indId != dropIdx, ]
-      importData$referenceValues$referenceValues <- importData$referenceValues$referenceValues[importData$referenceValues$referenceValues$indId != dropIdx, ]
-      importData$indicatorObservations$indicatorValues <- importData$indicatorObservations$indicatorValues[importData$indicatorObservations$indicatorValues$indId != dropIdx, ]
-      importData$indicators <- importData$indicators[importData$indicators$id != dropIdx, ]
-    }
+  if(!is.null(dropIdx)){
+    importData$ICunits <- importData$ICunits[!(importData$ICunits$indId %in% dropIdx), ]
+    importData$referenceValues$referenceValues <- importData$referenceValues$referenceValues[!(importData$referenceValues$referenceValues$indId %in% dropIdx), ]
+    importData$indicatorObservations$indicatorValues <- importData$indicatorObservations$indicatorValues[!(importData$indicatorObservations$indicatorValues$indId %in% dropIdx), ]
+    importData$indicators <- importData$indicators[!(importData$indicators$id %in% dropIdx), ]
   }
-
-  # TODO: Implement a routine for dropping a selection of indicators (list passed to function)
-  # from Nature Index and Ecological Condition data sets. 
   
   ## Optional: save step
   if(saveSteps){

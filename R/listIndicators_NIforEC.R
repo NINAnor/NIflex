@@ -9,9 +9,15 @@
 #' This function writes ecosystem-specific lists of indicators for making
 #' versions of the Nature Index for ecological condition assessments. 
 #' 
-#' NOTE: This function is incomplete and needs to be updated once discussions
+#' NOTES: 
+#' 
+#' This function is incomplete and needs to be updated once discussions
 #' about which indicators should be part of the different products have been
 #' concluded (expected late 2023).
+#' 
+#' For now, I have implemented an alternative approach where indicator lists for
+#' the Ecological Condition products are derived from the indicator set for the
+#' corresponding Nature Index, minus a TBD set of indicators that get dropped.
 #' 
 #' @param ecosystem character string specifying the ecosystem of interest. 
 #' Currently supported are "Forest", "Mountain", and "Wetland". 

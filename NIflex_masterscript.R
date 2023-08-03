@@ -76,8 +76,8 @@ if(OutputType == "NatureIndex"){
   #Ecosystem <- c("Wetlands", "Våtmark")
   #Ecosystem <- c("OpenLowland", "Åpent lavland")
   #Ecosystem <- c("Freshwater", "Ferskvann")
-  Ecosystem <- c("Coast", "Kystvann")
-  #Ecosystem <- c("Ocean", "Hav")
+  #Ecosystem <- c("Coast", "Kystvann")
+  Ecosystem <- c("Ocean", "Hav")
 }
 
 ## Thematic index (optional)
@@ -99,10 +99,18 @@ if(OutputType == "EcologicalCondition"){
   EC_ecosystem <- "Forest"
   #EC_ecosystem <- "Mountain"
   #EC_ecosystem <- "Wetland"
- IndicatorSet <- listIndicators_NIforEC(ecosystem = EC_ecosystem)  # TODO: Change to function that lists indicators to drop
+  #IndicatorSet <- listIndicators_NIforEC(ecosystem = EC_ecosystem)  # No longer needed as we'll likely go with an NI + drop indicators approach instead
 }else{
   EC_ecosystem <- NULL
 }
+
+## Options for dropping indicators
+#DropIdxMode <- "pre-defined"
+#if(DropIdxMode == "pre-defined"){DropIdxList <- NULL}
+
+DropIdxMode <- "custom"
+DropIdxList <- c(1, 92, 360)
+
 
 ## Diagnostics imputation
 Diagnostics <- TRUE # Yes
@@ -117,7 +125,7 @@ TestRun <- TRUE # Yeas
 # INDEX CALCULATION #
 #*******************#
 
-## Calculate index for specified ecosystem/indicators
+## Set ecosystem name
 if(OutputType == "NatureIndex"){
   ecosystem_use <- Ecosystem[2]
   indicators_use <- NULL
@@ -126,10 +134,17 @@ if(OutputType == "NatureIndex"){
   indicators_use <- IndicatorSet
 }
 
-  
+## Make list of indicators to drop
+dropIdx <- selectDropIndices(mode = DropIdxMode,
+                             OutputType = OutputType,
+                             ecosystem = ifelse(OutputType %in% c("NatureIndex", "EcologicalCondition"), ecosystem_use, NULL),
+                             customList = DropIdxList)
+
+## Calculate index for specified ecosystem/indicators
 CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
                               indicators = indicators_use,
                               theme = theme,
+                              dropIdx = dropIdx,
                               KeyIndicators = KeyIndicators,
                               KeyWeight = KeyWeight,
                               AreaWeights = AreaWeights,
