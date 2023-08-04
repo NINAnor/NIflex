@@ -173,7 +173,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   # NA IMPUTATION #
   #***************#
 
-  if(NAImputation){
+  if(NAImputation & !forceSkipImputation){
     NAImputes <- imputeData(x = NIObject,
                             nSim = nSim_run,
                             transConst = 0.01,
