@@ -9,6 +9,15 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
                               Diagnostics, TestRun,
                               norwegianNames = TRUE, saveSteps = TRUE){
   
+  ## Determine if imputation has to be skipped (currently the case for a few thematic indices)
+  if(OutputType == "ThematicIndex" & theme %in% c("Amphibians", "VascularPlants")){
+    forceSkipImputation <- TRUE
+    # TODO: This seems to be relevant when there are no missing values in indicator set. 
+    # This could probably be generalised to skip imputation whenever there are no missing values instead.  
+  }else{
+    forceSkipImputation <- FALSE
+  }
+  
   ## List implementation characteristics
   indexInfo <- list(OutputType = OutputType,
                     ecosystem = ecosystem,
