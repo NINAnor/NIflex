@@ -111,7 +111,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
       stop("NiObject assembly for thematic indices requires additional function arguments that have to be specified via 'funArguments'.")
     }
     
-    ## Adjust NI units for select thematic indices
+    # Adjust NI units for select thematic indices
     if(theme %in% c("Acidification", "Eutrophication", "AlpinePasserines")){
       NIunitsCustom <- addCustomSpatialUnits(theme = theme,
                                              importData = importData)
@@ -119,6 +119,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
       NIunitsCustom <- NULL
     }
     
+    # Assemble NIObject
     NIObject <- assembleNiObject(inputData = importData,
                                  NIunits = NIunitsCustom,
                                  predefNIunits = funArguments$predefNIunits,
@@ -136,9 +137,22 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   
   ## Custom index data assembly
   if(OutputType == "CustomIndex"){
-    stop("NiObject assembly for for custom indices has not been streamlined yet")
+    #stop("NiObject assembly for for custom indices has not been streamlined yet")
     # TODO: Write assembleNiObject() call for custom indices. Some of the function
     # arguments likely need to be controllable from the master script. 
+    
+    # Check for presence of additional function arguments
+    if(is.null(funArguments)){
+      stop("NiObject assembly for custom indices requires additional function arguments that have to be specified via 'funArguments'.")
+    }
+    
+    # Assemble NIObject
+    NIObject <- assembleNiObject(inputData = importData,
+                                 predefNIunits = funArguments$predefNIunits,
+                                 indexType = funArguments$indexType,
+                                 part = funArguments$part,
+                                 total = funArguments$total,
+                                 partOfTotal = funArguments$partOfTotal)
   }
   
   ## Ecosystem-level outputs: collapse generalists and specialists

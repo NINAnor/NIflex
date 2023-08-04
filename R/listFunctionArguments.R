@@ -32,7 +32,7 @@ listFunctionArguments <- function(OutputType, theme = NULL,
     checklist[6,] <- c(total %in% c("total", "marine", "terrestrial"), "total")
     checklist[7,] <- c(is.numeric(partOfTotal), "partOfTotal")
     checklist[8,] <- c(dplyr::between(partOfTotal, 0, 1), "partOfTotal")
-    checklist[9,] <- c(is.null(awBSunit) | awBSunit %in% c("Skog", "Fjell", "Våtmark", "Åpent lavland", "Ferskvann", "Kystvann", "Hav", "equalWeight"), "awBSunits") 
+    checklist[9,] <- c(is.null(awBSunit) | awBSunit %in% c("Skog", "Fjell", "Våtmark", "Åpent lavland", "Ferskvann", "Kystvann", "Hav"), "awBSunits") 
     
     if(!all(checklist[,1] == TRUE)){
       testFails <- paste(unique(checklist[which(checklist[,1] == FALSE),2]), collapse = ", ")

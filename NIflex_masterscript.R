@@ -18,6 +18,7 @@ library(RJSONIO)
 library(tibble)
 library(distr)
 library(lattice)
+library(sf)
 
 ## Source all functions in "R" folder
 sourceDir <- function(path, trace = TRUE, ...) {
@@ -64,8 +65,8 @@ norwegianNames <- TRUE # Yes
 #norwegianNames <- FALSE # No (English names instead)
 
 ## Output type
-#OutputType <- "NatureIndex"
-OutputType <- "ThematicIndex"
+OutputType <- "NatureIndex"
+#OutputType <- "ThematicIndex"
 #OutputType <- "CustomIndex"
 #OutputType <- "EcologicalCondition"
 
@@ -73,16 +74,16 @@ OutputType <- "ThematicIndex"
 if(OutputType == "NatureIndex"){
   #Ecosystem <- c("Forest", "Skog")
   #Ecosystem <- c("Mountain", "Fjell")
-  #Ecosystem <- c("Wetlands", "Våtmark")
+  Ecosystem <- c("Wetlands", "Våtmark")
   #Ecosystem <- c("OpenLowland", "Åpent lavland")
   #Ecosystem <- c("Freshwater", "Ferskvann")
   #Ecosystem <- c("Coast", "Kystvann")
-  Ecosystem <- c("Ocean", "Hav")
+  #Ecosystem <- c("Ocean", "Hav")
 }
 
 ## Thematic index (optional)
 if(OutputType == "ThematicIndex"){
-  theme <- "Acidification"
+  theme <- "Eutrophication"
   IndicatorSet <- listIndicators_thematicIndex(theme = theme)
 }else{
   theme <- "None"
@@ -124,7 +125,7 @@ if(OutputType == "CustomIndex"){
                                         part = "ecosystem", 
                                         total = "total", 
                                         partOfTotal = 0,
-                                        awBSunit = "equalWeights")
+                                        awBSunit = "Fjell")
 }
 
 if(!exists("funArguments")){
