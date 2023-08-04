@@ -82,7 +82,7 @@ if(OutputType == "NatureIndex"){
 
 ## Thematic index (optional)
 if(OutputType == "ThematicIndex"){
-  theme <- "AlpinePasserines"
+  theme <- "Acidification"
   IndicatorSet <- listIndicators_thematicIndex(theme = theme)
 }else{
   theme <- "None"

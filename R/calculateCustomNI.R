@@ -72,7 +72,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
                                    norwegian = norwegianNames,
                                    refYearCode = 0)
   }
-
+  
   ## Selective removal of indicators
   if(!is.null(dropIdx)){
     importData$ICunits <- importData$ICunits[!(importData$ICunits$indId %in% dropIdx), ]
@@ -106,17 +106,32 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   ## Thematic index data assembly
   if(OutputType == "ThematicIndex"){
     
+    # Check for presence of additional function arguments
     if(is.null(funArguments)){
-      stop("NiObject assembly for for thematic indices requires additional function arguments that have to be specified via 'funArguments'.")
+      stop("NiObject assembly for thematic indices requires additional function arguments that have to be specified via 'funArguments'.")
+    }
+    
+    ## Adjust NI units for select thematic indices
+    if(theme %in% c("Acidification", "Eutrophication", "AlpinePasserines")){
+      NIunitsCustom <- addCustomSpatialUnits(theme = theme,
+                                             importData = importData)
+    }else{
+      NIunitsCustom <- NULL
     }
     
     NIObject <- assembleNiObject(inputData = importData,
+                                 NIunits = NIunitsCustom,
                                  predefNIunits = funArguments$predefNIunits,
                                  indexType = funArguments$indexType,
                                  part = funArguments$part,
                                  total = funArguments$total,
                                  partOfTotal = funArguments$partOfTotal)
-    # TODO: Implement special NIunits used for themes AlpinePasserines, Acidification, and Eutrophication
+    
+    ## Adjust NIunits for seabird thematic indices
+    if(theme %in% c("CoastalSeabirds", "PelagicSeabirds")){
+      NIObject <- addCustomSpatialUnits(theme = theme,
+                                        NIObject = NIObject)
+    }
   }
   
   ## Custom index data assembly
