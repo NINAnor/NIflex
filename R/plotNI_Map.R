@@ -25,16 +25,14 @@ plotNI_Map <- function(Index, year, OutputType,
       stop("Seabird thematic indices are not spatially explicit and can therefore not be plotted as maps.")
     }
     
-    if(theme %in% c("Acidification", "Eutrophication", "AlpinePasserines")){
-      stop("Shapefiles for thematic indices 'Acidification', 'Eutrophication', and 'AlpinePasserines have not been added yet. Plotting maps for these thematic indices is therefore not possible.")
+    if(theme %in% c("Acidification", "Eutrophication")){
+      stop("Correct shapefiles for thematic indices 'Acidification' and 'Eutrophication' are missing at present. Plotting maps for these thematic indices is therefore not currently possible.")
     }
     
     shapeFolder <- dplyr::case_when(theme %in% c("Acidification", "Eutrophication") ~ NA,
-                                    theme == "AlpinePasserines" ~ NA,
+                                    theme == "AlpinePasserines" ~ "/NI_ecosystems/NI_ecosystem_Terrestrial",
                                     theme %in% c("Amphibians", "ForestryEffects", "VascularPlants") ~ "/NI_ecosystems/NI_ecosystem_Terrestrial",
                                     theme == "PelagicCommunities" ~ "/NI_ecosystems/NI_ecosystem_Ocean")
-    
-    # TODO: Download and convert shapefiles for missing thematic indices, then update code for selection
   }
   
   if(OutputType == "CustomIndex"){
@@ -66,16 +64,28 @@ plotNI_Map <- function(Index, year, OutputType,
   #-------------------------#
   
   ## List areas and abbreviations
-  areaNames <- data.frame(index_output = c(rep(c("E", "S", "W", "C", "N"), 2), "N", "C", "S", "E"),
+  areaNames <- data.frame(index_output = c(rep(c("E", "S", "W", "C", "N"), 2), 
+                                           "N", "C", "S", "E",
+                                           rep("Sør-Norge", 4), "Nord-Norge"),
                           shapefiles = c("Østlandet", "Sørlandet", "Vestlandet", "Midt-Norge", "Nord-Norge",
                                          "Østlandet Hav", "Sørlandet Hav", "Vestlandet Hav", "Midt-Norge Hav", "Nord-Norge Hav",
-                                         "Barentshavet", "Norskehavet", "Nordsjøen", "Skagerrak"),
-                          ecosystem = c(rep(c("Terrestrial", "Coast"), each = 5), rep("Ocean", 4)),
-                          theme = c(rep(NA, 5 + 5 + 4)))
+                                         "Barentshavet", "Norskehavet", "Nordsjøen", "Skagerrak", # TODO: Double-check matching of ocean areas to single letter abbreviations in NI output
+                                         "Østlandet", "Sørlandet", "Vestlandet", "Midt-Norge", "Nord-Norge"), 
+                          ecosystem = c(rep(c("Terrestrial", "Coast"), each = 5), 
+                                        rep("Ocean", 4), 
+                                        rep(NA, 5)),
+                          theme = c(rep(NA, 5 + 5 + 4), 
+                                    rep("AlpinePasserines", 5)))
   
   ## Subset to contain relevant areas only
   if(shapeFolder == "/NI_ecosystems/NI_ecosystem_Terrestrial"){
-    areaNames <- subset(areaNames, ecosystem == "Terrestrial")
+    
+    if(theme == "AlpinePasserines"){
+      areaNames <- subset(areaNames, theme == "AlpinePasserines")
+    }else{
+      areaNames <- subset(areaNames, ecosystem == "Terrestrial")
+    }
+    
   }
   
   if(shapeFolder %in% c("/NI_ecosystems/NI_ecosystem_Coast")){
@@ -86,6 +96,7 @@ plotNI_Map <- function(Index, year, OutputType,
   if(shapeFolder %in% c("/NI_ecosystems/NI_ecosystem_Ocean")){
     areaNames <- subset(areaNames, ecosystem == "Ocean")
   }
+  
   
   ## Summarise index data
   sumIndex <- summary(Index)

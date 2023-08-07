@@ -67,8 +67,8 @@ norwegianNames <- TRUE # Yes
 #norwegianNames <- FALSE # No (English names instead)
 
 ## Output type
-OutputType <- "NatureIndex"
-#OutputType <- "ThematicIndex"
+#OutputType <- "NatureIndex"
+OutputType <- "ThematicIndex"
 #OutputType <- "CustomIndex"
 #OutputType <- "EcologicalCondition"
 
@@ -85,7 +85,7 @@ if(OutputType == "NatureIndex"){
 
 ## Thematic index (optional)
 if(OutputType == "ThematicIndex"){
-  theme <- "Eutrophication"
+  theme <- "AlpinePasserines"
   IndicatorSet <- listIndicators_thematicIndex(theme = theme)
 }else{
   theme <- "None"
