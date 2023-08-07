@@ -40,9 +40,11 @@ plotNI_Map <- function(Index, year, OutputType,
       stop("Missing argument 'awBSunit'. Currently, ecosystem shapefiles are used for custom indices and the argument 'awBSunit' is required for selecting the relevan shapefile.")
     }else{
       warning("Currently, ecosystem shapefiles are used for custom indices.")
-      shapeFolder <-  dplyr::case_when(awBSunit %in% c("Fjell", "Skog", "Våtmark", "Åpent lavland", "Ferskvann") ~ "Terrestrial",
-                                       awBSunit == "Kystvann" ~ "Coast",
-                                       awBSunit == "Hav" ~ "Ocean")
+      ecosystem_paste <-  dplyr::case_when(awBSunit %in% c("Fjell", "Skog", "Våtmark", "Åpent lavland", "Ferskvann") ~ "Terrestrial",
+                                          awBSunit == "Kystvann" ~ "Coast",
+                                          awBSunit == "Hav" ~ "Ocean")
+      
+      shapeFolder <- paste0("/NI_ecosystems/NI_ecosystem_", ecosystem_paste)
     }
   }
   
@@ -80,8 +82,14 @@ plotNI_Map <- function(Index, year, OutputType,
   ## Subset to contain relevant areas only
   if(shapeFolder == "/NI_ecosystems/NI_ecosystem_Terrestrial"){
     
-    if(theme == "AlpinePasserines"){
-      areaNames <- subset(areaNames, theme == "AlpinePasserines")
+    if(OutputType == "ThematicIndex"){
+      
+      if(theme == "AlpinePasserines"){
+        areaNames <- subset(areaNames, theme == "AlpinePasserines")
+      }else{
+        areaNames <- subset(areaNames, ecosystem == "Terrestrial")
+      }
+      
     }else{
       areaNames <- subset(areaNames, ecosystem == "Terrestrial")
     }
@@ -178,7 +186,7 @@ plotNI_Map <- function(Index, year, OutputType,
     mapTitle <- paste0(theme, " (", year, ")")
   }
   if(OutputType == "CustomIndex"){
-    paste0("Custom index (", year, ")")
+    mapTitle <- paste0("Custom index (", year, ")")
   }
   
   ## Return specified combination of maps (single map scenario)
@@ -197,7 +205,7 @@ plotNI_Map <- function(Index, year, OutputType,
                                plotMedian & plotDisplacement ~ list(Map1, Map3),
                                plotCI & plotDisplacement ~ list(Map2, Map3))
     
-    outMap <- tmap_arrange(outMap[[1]], outMap[[2]], 
+    outMap <- tmap_arrange(outMap[[1]] + tm_layout(title = mapTitle), outMap[[2]] + tm_layout(title = mapTitle), 
                            sync = TRUE,
                            widths = c(1, 1),
                            heights = c(1, 1))

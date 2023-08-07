@@ -20,7 +20,8 @@ library(distr)
 library(lattice)
 library(sf)
 library(tmap)
-
+library(ggplot2)
+library(ggridges)
 
 ## Source all functions in "R" folder
 sourceDir <- function(path, trace = TRUE, ...) {
@@ -68,19 +69,19 @@ norwegianNames <- TRUE # Yes
 
 ## Output type
 #OutputType <- "NatureIndex"
-OutputType <- "ThematicIndex"
+#OutputType <- "ThematicIndex"
 #OutputType <- "CustomIndex"
-#OutputType <- "EcologicalCondition"
+OutputType <- "EcologicalCondition"
 
 ## Nature Index ecosystem (optional)
 if(OutputType == "NatureIndex"){
   #Ecosystem <- c("Forest", "Skog")
   #Ecosystem <- c("Mountain", "Fjell")
-  #Ecosystem <- c("Wetlands", "Våtmark")
+  Ecosystem <- c("Wetlands", "Våtmark")
   #Ecosystem <- c("OpenLowland", "Åpent lavland")
   #Ecosystem <- c("Freshwater", "Ferskvann")
   #Ecosystem <- c("Coast", "Kystvann")
-  Ecosystem <- c("Ocean", "Hav")
+  #Ecosystem <- c("Ocean", "Hav")
 }
 
 ## Thematic index (optional)
@@ -195,16 +196,29 @@ CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
 Index <- CustomNI$CustomIndex
 
 ## Plot time series
+
+# Standard
 plot(Index$wholeArea, main = "Custom index", cex = 1, lwd = 2, shade = TRUE)
 summary(Index$wholeArea)
 
-# TODO: Add code from NIviz for density ridge time-series plot
+# Density ridge plot
+plotNI_DensityRidgeTS(Index = Index, 
+                      OutputType = OutputType, 
+                      ecosystem = ecosystem_use, 
+                      theme = theme,
+                      allAreas = FALSE, 
+                      selectedArea  = "wholeArea")
+
+plotNI_DensityRidgeTS(Index = Index, 
+                      OutputType = OutputType, 
+                      ecosystem = ecosystem_use, 
+                      theme = theme,
+                      allAreas = TRUE)
 
 ## Plot map
-
 shapeLibraryPath <- "P:/41201611_naturindeks_2021_2023_vitenskapelig_ansvar/Shapefiles"
 
-if(OutputType %in% c("NatureIndex", "EcologicalConditions")){
+if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
   plotNI_Map(Index = Index, 
              year = 2019, 
              OutputType = OutputType, 
