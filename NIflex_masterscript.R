@@ -19,6 +19,8 @@ library(tibble)
 library(distr)
 library(lattice)
 library(sf)
+library(tmap)
+
 
 ## Source all functions in "R" folder
 sourceDir <- function(path, trace = TRUE, ...) {
@@ -74,11 +76,11 @@ OutputType <- "NatureIndex"
 if(OutputType == "NatureIndex"){
   #Ecosystem <- c("Forest", "Skog")
   #Ecosystem <- c("Mountain", "Fjell")
-  Ecosystem <- c("Wetlands", "Våtmark")
+  #Ecosystem <- c("Wetlands", "Våtmark")
   #Ecosystem <- c("OpenLowland", "Åpent lavland")
   #Ecosystem <- c("Freshwater", "Ferskvann")
   #Ecosystem <- c("Coast", "Kystvann")
-  #Ecosystem <- c("Ocean", "Hav")
+  Ecosystem <- c("Ocean", "Hav")
 }
 
 ## Thematic index (optional)
@@ -137,7 +139,7 @@ Diagnostics <- TRUE # Yes
 #Diagnostics <- FALSE # No
 
 ## Test run (10 vs. 1000 iterations in simulation)
-TestRun <- TRUE # Yeas
+TestRun <- TRUE # Yes
 #TestRun <- FALSE # No
 
 
@@ -200,7 +202,38 @@ summary(Index$wholeArea)
 
 ## Plot map
 
-# TODO: Add code from NIviz for plotting values and uncertainty to map 
+shapeLibraryPath <- "P:/41201611_naturindeks_2021_2023_vitenskapelig_ansvar/Shapefiles"
+
+if(OutputType %in% c("NatureIndex", "EcologicalConditions")){
+  plotNI_Map(Index = Index, 
+             year = 2019, 
+             OutputType = OutputType, 
+             ecosystem = ecosystem_use,
+             shapeLibraryPath = shapeLibraryPath,
+             plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
+             interactiveMap = FALSE)
+}
+
+if(OutputType == "ThematicIndex"){
+  plotNI_Map(Index = Index, 
+             year = 2019, 
+             OutputType = OutputType, 
+             theme = theme,
+             shapeLibraryPath = shapeLibraryPath,
+             plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
+             interactiveMap = FALSE)
+}
+
+if(OutputType == "CustomIndex"){
+  plotNI_Map(Index = Index, 
+             year = 2019, 
+             OutputType = OutputType, 
+             awBSunit = funArguments$awBSunit,
+             shapeLibraryPath = shapeLibraryPath,
+             plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
+             interactiveMap = FALSE)
+}
+
 
 ## Plot indicator weights
 plotWeights(Index$wholeArea$'2019')

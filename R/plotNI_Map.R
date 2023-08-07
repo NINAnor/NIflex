@@ -1,8 +1,7 @@
 
-shapeLibraryPath <- "P:/41201611_naturindeks_2021_2023_vitenskapelig_ansvar/Shapefiles"
 
 plotNI_Map <- function(Index, year, OutputType, 
-                       ecosystem = NULL, theme = NULL,
+                       ecosystem = NULL, theme = NULL, awBSunit = NULL,
                        shapeLibraryPath,
                        plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, interactiveMap = FALSE){
   
@@ -12,21 +11,40 @@ plotNI_Map <- function(Index, year, OutputType,
   
   ## Complete shapefile path
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
-    shapeFolder <- paste0("/NI_ecosystems/NI_ecosystem_", ecosystem)
-    # TODO: Download and convert shapefiles for remaining ecosystems
+    
+    ecosystem_paste <- dplyr::case_when(ecosystem %in% c("Fjell", "Skog", "Våtmark", "Åpent lavland", "Ferskvann") ~ "Terrestrial",
+                                        ecosystem == "Kystvann" ~ "Coast",
+                                        ecosystem == "Hav" ~ "Ocean")
+    
+    shapeFolder <- paste0("/NI_ecosystems/NI_ecosystem_", ecosystem_paste)
   }
   
   if(OutputType == "ThematicIndex"){
-    shapeFolder <- "/NI_themes_geoData"
-    # TODO: Download and convert shapefiles for all thematic indices, then update code for selection
+    
+    if(theme %in% c("CoastalSeabirds", "OceanSeabirds")){
+      stop("Seabird thematic indices are not spatially explicit and can therefore not be plotted as maps.")
+    }
+    
+    if(theme %in% c("Acidification", "Eutrophication", "AlpinePasserines")){
+      stop("Shapefiles for thematic indices 'Acidification', 'Eutrophication', and 'AlpinePasserines have not been added yet. Plotting maps for these thematic indices is therefore not possible.")
+    }
+    
+    shapeFolder <- dplyr::case_when(theme %in% c("Acidification", "Eutrophication") ~ NA,
+                                    theme == "AlpinePasserines" ~ NA,
+                                    theme %in% c("Amphibians", "ForestryEffects", "VascularPlants") ~ "/NI_ecosystems/NI_ecosystem_Terrestrial",
+                                    theme == "PelagicCommunities" ~ "/NI_ecosystems/NI_ecosystem_Ocean")
+    
+    # TODO: Download and convert shapefiles for missing thematic indices, then update code for selection
   }
   
   if(OutputType == "CustomIndex"){
-    if(is.null(ecosystem)){
-      stop("Missing argument 'ecosystem'. Currently, ecosystem shapefiles are used for custom indices and the argument 'ecosystem' therefore needs to be provided.")
+    if(is.null(awBSunit)){
+      stop("Missing argument 'awBSunit'. Currently, ecosystem shapefiles are used for custom indices and the argument 'awBSunit' is required for selecting the relevan shapefile.")
     }else{
       warning("Currently, ecosystem shapefiles are used for custom indices.")
-      shapeFolder <- paste0("/NI_ecosystems/NI_ecosystems_", ecosystem)
+      shapeFolder <-  dplyr::case_when(awBSunit %in% c("Fjell", "Skog", "Våtmark", "Åpent lavland", "Ferskvann") ~ "Terrestrial",
+                                       awBSunit == "Kystvann" ~ "Coast",
+                                       awBSunit == "Hav" ~ "Ocean")
     }
   }
   
@@ -38,9 +56,9 @@ plotNI_Map <- function(Index, year, OutputType,
   shp <- sf::st_make_valid(shp)
 
   ## Overlay shapefile with outline of Norway
-  nor <- sf::read_sf("data/outlineOfNorway_EPSG25833.shp")
-  nor <- st_transform(nor, crs = st_crs(shp))
-  shp <- st_intersection(shp, nor)
+  #nor <- sf::read_sf("data/outlineOfNorway_EPSG25833.shp")
+  #nor <- st_transform(nor, crs = st_crs(shp))
+  #shp <- st_intersection(shp, nor)
 
   
   #-------------------------#
@@ -48,10 +66,26 @@ plotNI_Map <- function(Index, year, OutputType,
   #-------------------------#
   
   ## List areas and abbreviations
-  areaNames <- data.frame(index_output = c("E", "S", "W", "C", "N"),
-                          shapefiles = c("Østlandet", "Sørlandet", "Vestlandet", "Midt-Norge", "Nord-Norge"),
-                          ecosystem = c(rep("Terrestrial", 5)),
-                          theme = c(rep(NA, 5)))
+  areaNames <- data.frame(index_output = c(rep(c("E", "S", "W", "C", "N"), 2), "N", "C", "S", "E"),
+                          shapefiles = c("Østlandet", "Sørlandet", "Vestlandet", "Midt-Norge", "Nord-Norge",
+                                         "Østlandet Hav", "Sørlandet Hav", "Vestlandet Hav", "Midt-Norge Hav", "Nord-Norge Hav",
+                                         "Barentshavet", "Norskehavet", "Nordsjøen", "Skagerrak"),
+                          ecosystem = c(rep(c("Terrestrial", "Coast"), each = 5), rep("Ocean", 4)),
+                          theme = c(rep(NA, 5 + 5 + 4)))
+  
+  ## Subset to contain relevant areas only
+  if(shapeFolder == "/NI_ecosystems/NI_ecosystem_Terrestrial"){
+    areaNames <- subset(areaNames, ecosystem == "Terrestrial")
+  }
+  
+  if(shapeFolder %in% c("/NI_ecosystems/NI_ecosystem_Coast")){
+    areaNames <- subset(areaNames, ecosystem == "Coast")
+  }
+  
+  
+  if(shapeFolder %in% c("/NI_ecosystems/NI_ecosystem_Ocean")){
+    areaNames <- subset(areaNames, ecosystem == "Ocean")
+  }
   
   ## Summarise index data
   sumIndex <- summary(Index)
