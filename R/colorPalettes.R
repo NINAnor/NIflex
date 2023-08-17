@@ -1,6 +1,6 @@
 
 # Make palettes
-NIviz_palettes = function(name, n, type = c("discrete", "continuous")) {
+NIviz_palettes <- function(name, n, type = c("discrete", "continuous")) {
   
   all_palettes = list(
     IndMap_cols = c("#A44B4B", "#EA4B4B", "#FD7F4B", "#FDC44B", "#F0FD58",

@@ -109,11 +109,11 @@ if(OutputType == "EcologicalCondition"){
 }
 
 ## Options for dropping indicators
-DropIdxMode <- "pre-defined"
-if(DropIdxMode == "pre-defined"){DropIdxList <- NULL}
+DropIndMode <- "pre-defined"
+if(DropIndMode == "pre-defined"){DropIndList <- NULL}
 
-#DropIdxMode <- "custom"
-#DropIdxList <- c(1, 92, 360)
+#DropIndMode <- "custom"
+#DropIndList <- c(1, 92, 360)
 
 ## Set function arguments (for thematic and custom indices)
 if(OutputType == "ThematicIndex"){
@@ -163,16 +163,16 @@ if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
 }
 
 ## Make list of indicators to drop
-dropIdx <- selectDropIndices(DropIdxMode = DropIdxMode,
-                             OutputType = OutputType,
-                             ecosystem = ifelse(OutputType %in% c("NatureIndex", "EcologicalCondition"), ecosystem_use, NULL),
-                             customList = DropIdxList)
+dropInd <- selectDropIndicators(DropIndMode = DropIndMode,
+                                OutputType = OutputType,
+                                ecosystem = ifelse(OutputType %in% c("NatureIndex", "EcologicalCondition"), ecosystem_use, NULL),
+                                customList = DropIndList)
 
 ## Calculate index for specified ecosystem/indicators
 CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
                               indicators = indicators_use,
                               theme = theme,
-                              dropIdx = dropIdx,
+                              dropInd = dropInd,
                               KeyIndicators = KeyIndicators,
                               KeyWeight = KeyWeight,
                               AreaWeights = AreaWeights,

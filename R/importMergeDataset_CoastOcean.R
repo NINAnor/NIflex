@@ -1,6 +1,33 @@
+#' Import merged datasets for coast and ocean ecosystems
+#'
+#' This is a helper function for importing data for the marine ecosystems "Kyst"
+#' (coast) and "Hav" (ocean). 
+#' Data for these ecosystems needs to be imported stepwise as they are stored in 
+#' the Nature Index database as two datasets each: one for seafloor and one for 
+#' open water (pelagic). This function imports both data sets and combines them
+#' into one for further analysis. 
+#' 
+#' @param ecosystem_part character vector of length two with the names of the 
+#' sub-ecosystems to combine. c("Kystvann-bunn", "Kystvann-pelagisk") for coast and
+#' c("Havbunn", "Hav-pelagisk") for ocean. 
+#' @param ecosystem character. The ecosystem for which to import a merged data
+#' file. Can be either "Kystvann" (coast) or "Hav" (ocean).
+#' @param username character. Username for the Nature Index database. 
+#' @param password character. Password for the Nature Index database.
+#' @param year integer vector specifying years for which to import data. 
+#' Note that at present, data in the Nature Index database is only available for
+#' years 1990, 2020, 2010, 2011, 2012, 2013, 2014, and 2019. 
+#' @param norwegian logical. If TRUE (default), data and results are returned
+#' with Norwegian indicator and ecosystem names. 
+#' @param refYearCode integer. The year to use as reference year, where 0 = 
+#' reference year as set in the database.  
+#'
+#' @return a list containing a combined dataset for ecosystems coast or ocean.
+#' @export
+#'
+#' @examples
 
-
-importMergeDataset_CoastOcean <- function(ecosystem_part, ecosystem, username, password, eco, year, norwegian, refYearCode){
+importMergeDataset_CoastOcean <- function(ecosystem_part, ecosystem, username, password, year, norwegian, refYearCode){
   
   ## Import all listed datasets
   importData <- list()
@@ -10,7 +37,7 @@ importMergeDataset_CoastOcean <- function(ecosystem_part, ecosystem, username, p
                                         eco = ecosystem_part[i],
                                         year = years,
                                         norwegian = norwegianNames,
-                                        refYearCode = 0)
+                                        refYearCode = refYearCode)
   }
   
   

@@ -1,7 +1,85 @@
-
+#' Calculate custom index based on data in the Nature Index Database
+#'
+#' This function is a wrapper for downloading select data from the Nature Index
+#' database and calculating a choice index from it according to the Nature Index
+#' methodology. 
+#' 
+#' The steps that the function goes through are as follows:
+#' 1) Data download via NIcalc::importDatasetApi
+#' 2) Assembly of input data for calculations via NIcalc::assembleNiObject
+#' 3) Optional: run dataset diagnostics via NIcalc::imputeDiagnostics
+#' 4) Optional: impute missing data via NIcalc::imputeData (which uses mice::mice)
+#' 5) Index calculation via NIcalc::calculateIndex
+#' 
+#' There are four groups of indices that can be calculated using this function: 
+#' Nature Index for any ecosystem (forest, mountain, wetlands, open lowland,
+#' freshwater, coast, and ocean), modified Nature Index for ecological condition
+#' assessments (for ecosystems forest, mountain, and wetlands), a selection of
+#' pre-defined thematic indices (see listIndicators_thematicIndex for supported
+#' thematic indices), and fully customized indices. 
+#' 
+#' The function allows a high degree of control over the calculation via a range
+#' of control arguments. That way, a user can choose the indicators and years 
+#' to include, whether and how to perform indicator weighting, whether or not to
+#' impute missing values, etc. 
+#' 
+#' Running this function requires valid user credentials for the Nature Index 
+#' database (https://naturindeks.nina.no/). Credentials may be requested from 
+#' NINA by contacting the project manager for the Nature Index. Currently 
+#' Chloé R. Nater: chloe.nater(at)nina.no.  
+#' 
+#' @param ecosystem character. The ecosystem for which to calculate the index. 
+#' Optional argument required when OutputType = "NatureIndex" or 
+#' "EcologicalCondition". Can be one of c("Skog", "Fjell", "Våtmark", 
+#' "Åpent lavland", "Ferskvann", "Kystvann", "Hav"). Note that only the first
+#' three are relevan for OutputType = "EcologicalCondition" so far. 
+#' @param indicators 
+#' @param theme character. Optional argument specifying which thematic index 
+#' should be produced. Required when OutputType = "ThematicIndex". For currently
+#' supported thematic indices, see documentation of listIndicators_thematicIndex().
+#' @param dropInd a vector containing integer IDs for indicators to drop.
+#' @param KeyIndicators logical. If TRUE, applies key indicator weighting, i.e. 
+#' the indicators categorized as key indicators will together make up a 
+#' proportion of the index equal to "KeyWeight". 
+#' @param KeyWeight numeric, between 0 and 1. Proportion of the index that is 
+#' allocated to key indicators. Only in effect if KeyIndicators = TRUE. 
+#' @param AreaWeights logical. If TRUE, weights indicators according to area. 
+#' @param TrophicWeights logical. If TRUE, weighs indicators according to 
+#' trophic group. 
+#' @param NAImputation logical. If TRUE, imputes missing values in dicator data
+#' using MICE (Multivariate Imputation by Chained Equations). If FALSE, ignores
+#' missing values. 
+#' @param years integer vector specifying years for which to calculate index. 
+#' Note that at present, data in the Nature Index database is only available for
+#' years 1990, 2020, 2010, 2011, 2012, 2013, 2014, and 2019. 
+#' @param OutputType character. The type of output the workflow will create, 
+#' here an optional argument. Can be one of 
+#' c("NatureIndex", "EcologicalCondition", "ThematicIndex", "CustomIndex").
+#' @param funArguments a list of arguments to pass on to downstream functions 
+#' from NIcalc. Required for output types "ThematicIndex" and "CustomIndex". 
+#' Output of listFunctionArguments(). 
+#' @param Diagnostics logical. If TRUE, calculates diagnostics for the dataset
+#' prior to imputation. If FALSE, skips diagnostics calculation. 
+#' @param TestRun logical. If TRUE, runs a shorter version of the workflow with 
+#' only 10 iterations for imputation and calculation. If FALSE, performs a full
+#' run with 1000 iterations instead. 
+#' @param norwegianNames logical. If TRUE (default), data and results are returned
+#' with Norwegian indicator and ecosystem names. 
+#' @param saveSteps logical. If TRUE (default), saves results at each step of
+#' the workflow as .rds files into the working directory. 
+#'
+#' @return a list of lists containing general information on the calculated 
+#' index ("indexInfo"), the raw dataset downloaded form the Nature Index database 
+#' ("importData"), the formatted input dataset underlying index calculations 
+#' ("InputData"), results of dataset diagnostics ("Diagnostics", only if 
+#' Diagnostics = TRUE), the imputed values for missing data points ("NAImputes,
+#' only if NAImputation = TRUE), and the calculated custom Index ("CustomIndex").
+#' @export
+#'
+#' @examples
 
 calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None",
-                              dropIdx = NULL,
+                              dropInd = NULL,
                               KeyIndicators, KeyWeight, 
                               AreaWeights, TrophicWeights,
                               NAImputation, years, OutputType,
@@ -49,7 +127,6 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
                                                   ecosystem = ecosystem,
                                                   username = NIdb_username,
                                                   password = NIdb_password,
-                                                  eco = ecosystem,
                                                   year = years,
                                                   norwegian = norwegianNames,
                                                   refYearCode = 0)
@@ -74,11 +151,11 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   }
   
   ## Selective removal of indicators
-  if(!is.null(dropIdx)){
-    importData$ICunits <- importData$ICunits[!(importData$ICunits$indId %in% dropIdx), ]
-    importData$referenceValues$referenceValues <- importData$referenceValues$referenceValues[!(importData$referenceValues$referenceValues$indId %in% dropIdx), ]
-    importData$indicatorObservations$indicatorValues <- importData$indicatorObservations$indicatorValues[!(importData$indicatorObservations$indicatorValues$indId %in% dropIdx), ]
-    importData$indicators <- importData$indicators[!(importData$indicators$id %in% dropIdx), ]
+  if(!is.null(dropInd)){
+    importData$ICunits <- importData$ICunits[!(importData$ICunits$indId %in% dropInd), ]
+    importData$referenceValues$referenceValues <- importData$referenceValues$referenceValues[!(importData$referenceValues$referenceValues$indId %in% dropInd), ]
+    importData$indicatorObservations$indicatorValues <- importData$indicatorObservations$indicatorValues[!(importData$indicatorObservations$indicatorValues$indId %in% dropInd), ]
+    importData$indicators <- importData$indicators[!(importData$indicators$id %in% dropInd), ]
   }
   
   ## Optional: save step

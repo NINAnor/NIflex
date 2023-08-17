@@ -1,3 +1,24 @@
+#' Add custom spatial units to input data for thematic indices
+#'
+#' A subset of thematic indices use their own specific spatial units. 
+#' At present, this is the case for thematic indices "Acidification", "Eutrophication",
+#' "AlpinePasserines", "CoastalSeabirds", and "PelagicSeabirds". 
+#' 
+#' For the first three, custom spatial units get added to the data right after
+#' import and the argument importData needs to be provided. 
+#' For the seabird indices, custom spatial units get added to the assembled
+#' NiObject and the argument NIObject needs to be provided. 
+#' 
+#' @param theme character. Argument specifying which thematic index 
+#' should be produced. Required when OutputType = "ThematicIndex". For currently
+#' supported thematic indices, see documentation of listIndicators_thematicIndex().
+#' @param NIObject list containing assembled NiObject. 
+#' @param importData list containing imported data. 
+#'
+#' @return imported dataset or assembled NiObject with custom spatial units. 
+#' @export
+#'
+#' @examples
 
 addCustomSpatialUnits <- function(theme, NIObject = NULL, importData = NULL){
   

@@ -12,7 +12,8 @@
 #' "CoastalSeabirds", "Eutrophication", "ForestryEffects", "PelagicCommunities", 
 #' "PelagicSeabirds", "VascularPlants". 
 #'
-#' @return
+#' @return a character vector containing Norwegian names for the indicators that
+#' form part of the specified thematic index. 
 #' @export
 #'
 #' @examples
