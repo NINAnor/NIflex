@@ -1,0 +1,30 @@
+Package: NIflex
+Title: Flexible workflows for generating Nature Index (products)
+Version: 0.0.0.9000
+Authors@R: 
+    person("Chloé R.", "Nater", , "chloe.nater@nina.no", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7975-0108"))
+Description: This package contains a series of wrapper-, helper-, and plotting 
+    functions that together make up a flexible workflow for downloading data
+    from the database for the Norwegian Nature Index and using it to calculate
+    the Nature Index for different ecosystems, pre-defined thematic indices
+    to publish alongside the Nature Index, modified Nature Index products for 
+    use in Ecological Condition Assessments, and fully customizable Nature Index
+    products.
+URL: https://github.com/NINAnor/NIviz
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    dplyr,
+    ggplot2,
+    ggridges,
+    NIcalc,
+    RColorBrewer,
+    rlang,
+    sf,
+    tmap
+Depends: 
+    R (>= 2.10)
+LazyData: true
