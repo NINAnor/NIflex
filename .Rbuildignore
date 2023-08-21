@@ -1,0 +1,6 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+NIflex_masterscript.R
+CustomIndex_Data.rds
+stepData.rds
