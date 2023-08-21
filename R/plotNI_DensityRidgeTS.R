@@ -44,6 +44,9 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
   
   ## Remove potential spaces in area names
   areas <- stringr::str_replace_all(areas, pattern = " ", replacement = "_")
+  areas <- stringr::str_replace_all(areas, pattern = "-", replacement = "_")
+  
+  names(Index) <- areas
   
   ## List years
   years <- names(Index[[1]])
