@@ -8,30 +8,8 @@ if(system.file(package = 'NIcalc') == ""){
 }
 
 
-## Load packages
-library(NIcalc)
-library(gamlss)
-library(msm)
-library(plyr)
-library(mice)
-library(RJSONIO)
-library(tibble)
-library(distr)
-library(lattice)
-library(sf)
-library(tmap)
-library(ggplot2)
-library(ggridges)
-
-## Source all functions in "R" folder
-sourceDir <- function(path, trace = TRUE, ...) {
-  for (nm in list.files(path, pattern = "[.][RrSsQq]$")) {
-    if(trace) cat(nm,":")
-    source(file.path(path, nm), ...)
-    if(trace) cat("\n")
-  }
-}
-sourceDir('R')
+## Load package
+library(NIflex)
 
 ## Set database credentials
 NIdb_username <- Sys.getenv("NIDB_USRNAME")
@@ -69,9 +47,9 @@ norwegianNames <- TRUE # Yes
 
 ## Output type
 #OutputType <- "NatureIndex"
-#OutputType <- "ThematicIndex"
+OutputType <- "ThematicIndex"
 #OutputType <- "CustomIndex"
-OutputType <- "EcologicalCondition"
+#OutputType <- "EcologicalCondition"
 
 ## Nature Index ecosystem (optional)
 if(OutputType == "NatureIndex"){
@@ -86,7 +64,7 @@ if(OutputType == "NatureIndex"){
 
 ## Thematic index (optional)
 if(OutputType == "ThematicIndex"){
-  theme <- "AlpinePasserines"
+  theme <- "Acidification"
   IndicatorSet <- listIndicators_thematicIndex(theme = theme)
 }else{
   theme <- "None"
@@ -109,11 +87,11 @@ if(OutputType == "EcologicalCondition"){
 }
 
 ## Options for dropping indicators
-DropIdxMode <- "pre-defined"
-if(DropIdxMode == "pre-defined"){DropIdxList <- NULL}
+DropIndMode <- "pre-defined"
+if(DropIndMode == "pre-defined"){DropIndList <- NULL}
 
-#DropIdxMode <- "custom"
-#DropIdxList <- c(1, 92, 360)
+#DropIndMode <- "custom"
+#DropIndList <- c(1, 92, 360)
 
 ## Set function arguments (for thematic and custom indices)
 if(OutputType == "ThematicIndex"){
@@ -163,16 +141,18 @@ if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
 }
 
 ## Make list of indicators to drop
-dropIdx <- selectDropIndices(DropIdxMode = DropIdxMode,
-                             OutputType = OutputType,
-                             ecosystem = ifelse(OutputType %in% c("NatureIndex", "EcologicalCondition"), ecosystem_use, NULL),
-                             customList = DropIdxList)
+dropInd <- selectDropIndicators(DropIndMode = DropIndMode,
+                                OutputType = OutputType,
+                                ecosystem = ifelse(OutputType %in% c("NatureIndex", "EcologicalCondition"), ecosystem_use, NULL),
+                                customList = DropIndList)
 
 ## Calculate index for specified ecosystem/indicators
 CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
                               indicators = indicators_use,
                               theme = theme,
-                              dropIdx = dropIdx,
+                              dropInd = dropInd,
+                              username = NIdb_username,
+                              password = NIdb_password,
                               KeyIndicators = KeyIndicators,
                               KeyWeight = KeyWeight,
                               AreaWeights = AreaWeights,
@@ -250,9 +230,9 @@ if(OutputType == "CustomIndex"){
 
 
 ## Plot indicator weights
-plotWeights(Index$wholeArea$'2019')
-plotWeights(Index$wholeArea$'2019', group = "troph")
-summaryWeights(Index$wholeArea)
+NIcalc::plotWeights(Index$wholeArea$'2019')
+NIcalc::plotWeights(Index$wholeArea$'2019', group = "troph")
+NIcalc::summaryWeights(Index$wholeArea)
 
 
 
