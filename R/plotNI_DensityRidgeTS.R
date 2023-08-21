@@ -87,7 +87,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
     }
     
     ## Subset data to selected area
-    IndexData.sub <- subset(IndexData, Area == selectedArea)
+    IndexData.sub <- subset(IndexData, IndexData$Area == selectedArea)
     
     ## Plot density ridge time series for data subset
     
@@ -96,18 +96,18 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
     colorMap <- c("#1F8C81", IndMap_cols)
     
     # Plot densities
-    outPlot <- ggplot(IndexData.sub, aes(x = Index, y = Year, fill = stat(x))) +
-      geom_density_ridges_gradient(scale = 5, rel_min_height = 0.01, quantile_lines = TRUE, quantiles = 2) + 
-      scale_fill_gradientn(colours = colorMap,
+    outPlot <- ggplot2::ggplot(IndexData.sub, ggplot2::aes(x = .data$Index, y = .data$Year, fill = stat(x))) +
+      ggridges::geom_density_ridges_gradient(scale = 5, rel_min_height = 0.01, quantile_lines = TRUE, quantiles = 2) + 
+      ggplot2::scale_fill_gradientn(colours = colorMap,
                            values = valuesMap,
                            limits = c(0, 1)) +
-      scale_y_discrete(limits = rev) + 
-      ggtitle(paste0(plotTitle, " (area: ", selectedArea, ")")) + 
-      xlab("Index value") + ylab("") + 
-      theme_classic() + 
-      theme(legend.title = element_blank(), plot.title = element_text(hjust = 0.5),
-            axis.line.y = element_blank(), axis.ticks.y = element_blank(),
-            panel.grid.major.y = element_line(color = "grey80"))
+      ggplot2::scale_y_discrete(limits = rev) + 
+      ggplot2::ggtitle(paste0(plotTitle, " (area: ", selectedArea, ")")) + 
+      ggplot2::xlab("Index value") + ggplot2::ylab("") + 
+      ggplot2::theme_classic() + 
+      ggplot2::theme(legend.title = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5),
+            axis.line.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(),
+            panel.grid.major.y = ggplot2::element_line(color = "grey80"))
     
   }
   
@@ -125,19 +125,19 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
     colorMap <- c("#1F8C81", IndMap_cols)
     
     # Plot densities
-    outPlot <- ggplot(IndexData, aes(x = Index, y = Year, fill = stat(x))) +
-      geom_density_ridges_gradient(scale = 5, rel_min_height = 0.01, quantile_lines = TRUE, quantiles = 2) + 
-      scale_fill_gradientn(colours = colorMap,
+    outPlot <- ggplot2::ggplot(IndexData, ggplot2::aes(x = .data$Index, y = .data$Year, fill = stat(x))) +
+      ggridges::geom_density_ridges_gradient(scale = 5, rel_min_height = 0.01, quantile_lines = TRUE, quantiles = 2) + 
+      ggplot2::scale_fill_gradientn(colours = colorMap,
                            values = valuesMap,
                            limits = c(0, 1)) +
-      scale_y_discrete(limits = rev) + 
-      facet_wrap(~ Area) +
-      ggtitle(plotTitle) + 
-      xlab("Index value") + ylab("") + 
-      theme_classic() + 
-      theme(legend.title = element_blank(), plot.title = element_text(hjust = 0.5),
-            axis.line.y = element_blank(), axis.ticks.y = element_blank(),
-            panel.grid.major.y = element_line(color = "grey80"))
+      ggplot2::scale_y_discrete(limits = rev) + 
+      ggplot2::facet_wrap(~ Area) +
+      ggplot2::ggtitle(plotTitle) + 
+      ggplot2::xlab("Index value") + ggplot2::ylab("") + 
+      ggplot2::theme_classic() + 
+      ggplot2::theme(legend.title = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5),
+            axis.line.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(),
+            panel.grid.major.y = ggplot2::element_line(color = "grey80"))
     
   }
   

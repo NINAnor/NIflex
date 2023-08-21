@@ -32,12 +32,12 @@ importMergeDataset_CoastOcean <- function(ecosystem_part, ecosystem, username, p
   ## Import all listed datasets
   importData <- list()
   for(i in 1:length(ecosystem_part)){
-    importData[[i]] <- importDatasetApi(username = NIdb_username,
-                                        password = NIdb_password,
-                                        eco = ecosystem_part[i],
-                                        year = years,
-                                        norwegian = norwegianNames,
-                                        refYearCode = refYearCode)
+    importData[[i]] <- NIcalc::importDatasetApi(username = username,
+                                                password = password,
+                                                eco = ecosystem_part[i],
+                                                year = year,
+                                                norwegian = norwegian,
+                                                refYearCode = refYearCode)
   }
   
   
@@ -105,12 +105,12 @@ importMergeDataset_CoastOcean <- function(ecosystem_part, ecosystem, username, p
   ecosystems$name <- ecosystem
   
   ## Reassemble data
-  ImportData <- niDataImport(indicators = indicators,
-                             referenceValues = referenceValues,
-                             indicatorObservations = indicatorObservations,
-                             ICunits = ICunits,
-                             BSunits = BSunits,
-                             ecosystems = ecosystems)
+  ImportData <- NIcalc::niDataImport(indicators = indicators,
+                                     referenceValues = referenceValues,
+                                     indicatorObservations = indicatorObservations,
+                                     ICunits = ICunits,
+                                     BSunits = BSunits,
+                                     ecosystems = ecosystems)
   
   ## Coast only: adjust fidelities (?)
   if(ecosystem == "Kystvann"){

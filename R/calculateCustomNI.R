@@ -33,11 +33,15 @@
 #' "EcologicalCondition". Can be one of c("Skog", "Fjell", "Våtmark", 
 #' "Åpent lavland", "Ferskvann", "Kystvann", "Hav"). Note that only the first
 #' three are relevan for OutputType = "EcologicalCondition" so far. 
-#' @param indicators 
+#' @param indicators character vector containing Norwegian names of indicators 
+#' to include in the custom index. Optional argument that has to be provided
+#' when calculating thematic or fully custom indices.
 #' @param theme character. Optional argument specifying which thematic index 
 #' should be produced. Required when OutputType = "ThematicIndex". For currently
 #' supported thematic indices, see documentation of listIndicators_thematicIndex().
 #' @param dropInd a vector containing integer IDs for indicators to drop.
+#' @param username character. Username for the Nature Index database. 
+#' @param password character. Password for the Nature Index database.
 #' @param KeyIndicators logical. If TRUE, applies key indicator weighting, i.e. 
 #' the indicators categorized as key indicators will together make up a 
 #' proportion of the index equal to "KeyWeight". 
@@ -80,6 +84,7 @@
 
 calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None",
                               dropInd = NULL,
+                              username, password,
                               KeyIndicators, KeyWeight, 
                               AreaWeights, TrophicWeights,
                               NAImputation, years, OutputType,
@@ -125,29 +130,29 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
       
       importData <- importMergeDataset_CoastOcean(ecosystem_part = ecosystem_part,
                                                   ecosystem = ecosystem,
-                                                  username = NIdb_username,
-                                                  password = NIdb_password,
+                                                  username = username,
+                                                  password = password,
                                                   year = years,
                                                   norwegian = norwegianNames,
                                                   refYearCode = 0)
       
     }else{
       
-      importData <- importDatasetApi(username = NIdb_username,
-                                     password = NIdb_password,
-                                     eco = ecosystem,
-                                     year = years,
-                                     norwegian = norwegianNames,
-                                     refYearCode = 0)
+      importData <- NIcalc::importDatasetApi(username = username,
+                                             password = password,
+                                             eco = ecosystem,
+                                             year = years,
+                                             norwegian = norwegianNames,
+                                             refYearCode = 0)
     }
 
   }else{
-    importData <- importDatasetApi(username = NIdb_username,
-                                   password = NIdb_password,
-                                   indic = indicators,
-                                   year = years,
-                                   norwegian = norwegianNames,
-                                   refYearCode = 0)
+    importData <- NIcalc::importDatasetApi(username = username,
+                                           password = password,
+                                           indic = indicators,
+                                           year = years,
+                                           norwegian = norwegianNames,
+                                           refYearCode = 0)
   }
   
   ## Selective removal of indicators
@@ -172,12 +177,12 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   
   ## Nature Index and Ecological Condition data assembly
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
-    NIObject <- assembleNiObject(inputData = importData,
-                                 predefNIunits = c(allArea = T, parts = T, counties = F),
-                                 indexType = "ecosystem",
-                                 part = "ecosystem",
-                                 total = ifelse(ecosystem == "Fjell", "terrestrial", "total"),
-                                 partOfTotal = ifelse(ecosystem == "Fjell", 0.2, 0))
+    NIObject <- NIcalc::assembleNiObject(inputData = importData,
+                                         predefNIunits = c(allArea = T, parts = T, counties = F),
+                                         indexType = "ecosystem",
+                                         part = "ecosystem",
+                                         total = ifelse(ecosystem == "Fjell", "terrestrial", "total"),
+                                         partOfTotal = ifelse(ecosystem == "Fjell", 0.2, 0))
   }
 
   ## Thematic index data assembly
@@ -197,13 +202,13 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
     }
     
     # Assemble NIObject
-    NIObject <- assembleNiObject(inputData = importData,
-                                 NIunits = NIunitsCustom,
-                                 predefNIunits = funArguments$predefNIunits,
-                                 indexType = funArguments$indexType,
-                                 part = funArguments$part,
-                                 total = funArguments$total,
-                                 partOfTotal = funArguments$partOfTotal)
+    NIObject <- NIcalc::assembleNiObject(inputData = importData,
+                                         NIunits = NIunitsCustom,
+                                         predefNIunits = funArguments$predefNIunits,
+                                         indexType = funArguments$indexType,
+                                         part = funArguments$part,
+                                         total = funArguments$total,
+                                         partOfTotal = funArguments$partOfTotal)
     
     ## Adjust NIunits for seabird thematic indices
     if(theme %in% c("CoastalSeabirds", "PelagicSeabirds")){
@@ -224,12 +229,12 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
     }
     
     # Assemble NIObject
-    NIObject <- assembleNiObject(inputData = importData,
-                                 predefNIunits = funArguments$predefNIunits,
-                                 indexType = funArguments$indexType,
-                                 part = funArguments$part,
-                                 total = funArguments$total,
-                                 partOfTotal = funArguments$partOfTotal)
+    NIObject <- NIcalc::assembleNiObject(inputData = importData,
+                                         predefNIunits = funArguments$predefNIunits,
+                                         indexType = funArguments$indexType,
+                                         part = funArguments$part,
+                                         total = funArguments$total,
+                                         partOfTotal = funArguments$partOfTotal)
   }
   
   ## Ecosystem-level outputs: collapse generalists and specialists
@@ -262,10 +267,10 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   #************************#
   
   if(Diagnostics){
-    DataDiagnostics <- imputeDiagnostics(x = NIObject,
-                                         nSim = 10,
-                                         transConst = 0.01,
-                                         maxit = 20) # TODO: Check with Bård why this number varies for different indices
+    DataDiagnostics <- NIcalc::imputeDiagnostics(x = NIObject,
+                                                 nSim = 10,
+                                                 transConst = 0.01,
+                                                 maxit = 20) # TODO: Check with Bård why this number varies for different indices
     #DataDiagnostics$diagnostics$convergencePlot
     
     if(saveSteps){
@@ -280,11 +285,11 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   #***************#
 
   if(NAImputation & !forceSkipImputation){
-    NAImputes <- imputeData(x = NIObject,
-                            nSim = nSim_run,
-                            transConst = 0.01,
-                            maxit = 20, # TODO: Check with Bård why this number varies for different indices
-                            printFlag = TRUE)
+    NAImputes <- NIcalc::imputeData(x = NIObject,
+                                    nSim = nSim_run,
+                                    transConst = 0.01,
+                                    maxit = 20, # TODO: Check with Bård why this number varies for different indices
+                                    printFlag = TRUE)
     
     stepData$NAImputes <- NAImputes
     
@@ -310,15 +315,15 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   }
   
   ## Calculate custom index
-  CustomIndex <- calculateIndex(x = NIObject,
-                                imputations = NAImputes,
-                                awBSunit = awBSunit_use, 
-                                nsim = nSim_run,
-                                fids = FALSE, 
-                                tgroups = TrophicWeights, # Trophic weighing
-                                awbs = AreaWeights, # Area weighing
-                                keys = ifelse(KeyIndicators, "specialWeight", "ignore"), # Use of key indicators
-                                w = ifelse(KeyIndicators, KeyWeight, NULL)) # Weight of key indicators
+  CustomIndex <- NIcalc::calculateIndex(x = NIObject,
+                                        imputations = NAImputes,
+                                        awBSunit = awBSunit_use, 
+                                        nsim = nSim_run,
+                                        fids = FALSE, 
+                                        tgroups = TrophicWeights, # Trophic weighing
+                                        awbs = AreaWeights, # Area weighing
+                                        keys = ifelse(KeyIndicators, "specialWeight", "ignore"), # Use of key indicators
+                                        w = ifelse(KeyIndicators, KeyWeight, NULL)) # Weight of key indicators
   
   
   ## Save and return results

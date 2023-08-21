@@ -164,7 +164,7 @@ plotNI_Map <- function(Index, year, OutputType,
   indexAreas <- names(sumIndex)[which(names(sumIndex)!="wholeArea")]
   
   ## Assemble index data for selected year
-  indexData <- subset(areaNames, index_output%in%indexAreas)[, c("index_output", "shapefiles")]
+  indexData <- subset(areaNames, areaNames$index_output%in%indexAreas)[, c("index_output", "shapefiles")]
   indexData$displacement <- indexData$widthCI <- indexData$medianValue <- NA
   
   for(i in 1:nrow(indexData)){
@@ -198,32 +198,32 @@ plotNI_Map <- function(Index, year, OutputType,
   pal3 <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 9, name = "Purples"))(5)
   
   ## Plot map of median values
-  Map1 <- tm_shape(shp) +
-    tm_polygons(col = "medianValue", 
+  Map1 <- tmap::tm_shape(shp) +
+    tmap::tm_polygons(col = "medianValue", 
                 border.col = ifelse(interactiveMap, "white", "black"),
                 #style = "cont",
                 breaks = seq(0, 1, length.out = 11),
                 palette = pal1)
   
   ## Plot map of CI widths (uncertainty)
-  Map2 <- tm_shape(shp) +
-    tm_polygons(col = "widthCI", 
+  Map2 <- tmap::tm_shape(shp) +
+    tmap::tm_polygons(col = "widthCI", 
                 border.col = "black",
                 breaks = seq(0, 0.25, length.out = 6),
                 palette = pal2)
   
   ## Plot map of displacement
-  Map3 <- tm_shape(shp) +
-    tm_polygons(col = "displacement", 
+  Map3 <- tmap::tm_shape(shp) +
+    tmap::tm_polygons(col = "displacement", 
                 border.col = "black",
                 breaks = seq(-0.105, 0, length.out = 8),
                 palette = pal3)
   
   ## Optional: activate interactive map mode
   if(interactiveMap){
-    tmap_mode("view")
+    tmap::tmap_mode("view")
   }else{
-    tmap_mode("plot")
+    tmap::tmap_mode("plot")
   }
   
   ## Count number of maps to plot
@@ -249,7 +249,7 @@ plotNI_Map <- function(Index, year, OutputType,
                                plotCI ~ Map2,
                                plotDisplacement ~ Map3)
     
-    outMap <- outMap + tm_layout(title = mapTitle)
+    outMap <- outMap + tmap::tm_layout(title = mapTitle)
   }
 
   
@@ -259,7 +259,8 @@ plotNI_Map <- function(Index, year, OutputType,
                                plotMedian & plotDisplacement ~ list(Map1, Map3),
                                plotCI & plotDisplacement ~ list(Map2, Map3))
     
-    outMap <- tmap_arrange(outMap[[1]] + tm_layout(title = mapTitle), outMap[[2]] + tm_layout(title = mapTitle), 
+    outMap <- tmap::tmap_arrange(outMap[[1]] + tmap::tm_layout(title = mapTitle), 
+                                 outMap[[2]] + tmap::tm_layout(title = mapTitle), 
                            sync = TRUE,
                            widths = c(1, 1),
                            heights = c(1, 1))

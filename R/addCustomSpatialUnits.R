@@ -31,7 +31,7 @@ addCustomSpatialUnits <- function(theme, NIObject = NULL, importData = NULL){
   #--------------------------------#
   
   if(theme %in% c("Acidification", "Eutrophication")){
-    NIunitsCustom <- read.table(file = "data/NIunits_AcidificationEutrophication.txt", header = TRUE, sep="\t")
+    NIunitsCustom <- NIflex::NIunits_AcidEutr
     
     return(NIunitsCustom)
   }
