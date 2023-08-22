@@ -291,9 +291,8 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
                                     maxit = 20, # TODO: Check with Bård why this number varies for different indices
                                     printFlag = TRUE)
     
-    stepData$NAImputes <- NAImputes
-    
     if(saveSteps){
+      stepData$NAImputes <- NAImputes
       saveRDS(stepData, file = "stepData.rds")
     }
     
@@ -323,7 +322,7 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
                                         tgroups = TrophicWeights, # Trophic weighing
                                         awbs = AreaWeights, # Area weighing
                                         keys = ifelse(KeyIndicators, "specialWeight", "ignore"), # Use of key indicators
-                                        w = ifelse(KeyIndicators, KeyWeight, NULL)) # Weight of key indicators
+                                        w = KeyWeight) # Weight of key indicators
   
   
   ## Save and return results

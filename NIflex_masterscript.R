@@ -24,12 +24,12 @@ NIdb_password <- Sys.getenv("NIDB_PASSWORD")
 years <- c("1990", "2000", "2010", "2014", "2019")
 
 ## Missing value imputation
-NAImputation <- TRUE # Yes
-#NAImputation <- FALSE # No
+#NAImputation <- TRUE # Yes
+NAImputation <- FALSE # No
 
 ## Key indicator weighing
-KeyIndicators <- TRUE # Yes
-#KeyIndicators <- FALSE # No
+#KeyIndicators <- TRUE # Yes
+KeyIndicators <- FALSE # No
 
 KeyWeight <- 0.5
 
@@ -47,9 +47,9 @@ norwegianNames <- TRUE # Yes
 
 ## Output type
 #OutputType <- "NatureIndex"
-OutputType <- "ThematicIndex"
+#OutputType <- "ThematicIndex"
 #OutputType <- "CustomIndex"
-#OutputType <- "EcologicalCondition"
+OutputType <- "EcologicalCondition"
 
 ## Nature Index ecosystem (optional)
 if(OutputType == "NatureIndex"){
@@ -164,7 +164,7 @@ CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
                               Diagnostics = Diagnostics,
                               TestRun = TestRun,
                               norwegianNames = norwegianNames,
-                              saveSteps = TRUE)
+                              saveSteps = FALSE)
   
 
 
