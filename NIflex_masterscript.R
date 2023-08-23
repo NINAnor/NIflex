@@ -25,7 +25,7 @@ years <- c("1990", "2000", "2010", "2014", "2019")
 
 ## Missing value imputation
 #NAImputation <- TRUE # Yes
-NAImputation <- FALSE # No
+NAImputation <- TRUE # No
 
 ## Key indicator weighing
 #KeyIndicators <- TRUE # Yes

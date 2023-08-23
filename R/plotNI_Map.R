@@ -245,11 +245,11 @@ plotNI_Map <- function(Index, year, OutputType,
   
   ## Return specified combination of maps (single map scenario)
   if(mapCount == 1){
-    outMap <- dplyr::case_when(plotMedian ~ Map1,
-                               plotCI ~ Map2,
-                               plotDisplacement ~ Map3)
+    outMap <- dplyr::case_when(plotMedian ~ list(Map1),
+                               plotCI ~ list(Map2),
+                               plotDisplacement ~ list(Map3))
     
-    outMap <- outMap + tmap::tm_layout(title = mapTitle)
+    outMap <- outMap[[1]] + tmap::tm_layout(title = mapTitle)
   }
 
   
