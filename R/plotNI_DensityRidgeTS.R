@@ -102,7 +102,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
     colorMap <- c("#1F8C81", IndMap_cols)
     
     # Plot densities
-    outPlot <- ggplot2::ggplot(IndexData.sub, ggplot2::aes(x = .data$Index, y = .data$Year, fill = after_stat(x))) +
+    outPlot <- ggplot2::ggplot(IndexData.sub, ggplot2::aes(x = .data$Index, y = .data$Year, fill = stat(x))) +
       ggridges::geom_density_ridges_gradient(scale = 5, rel_min_height = 0.01, quantile_lines = TRUE, quantiles = 2) + 
       ggplot2::scale_fill_gradientn(colours = colorMap,
                            values = valuesMap,
@@ -131,7 +131,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
     colorMap <- c("#1F8C81", IndMap_cols)
     
     # Plot densities
-    outPlot <- ggplot2::ggplot(IndexData, ggplot2::aes(x = .data$Index, y = .data$Year, fill = after_stat(x))) +
+    outPlot <- ggplot2::ggplot(IndexData, ggplot2::aes(x = .data$Index, y = .data$Year, fill = stat(x))) +
       ggridges::geom_density_ridges_gradient(scale = 5, rel_min_height = 0.01, quantile_lines = TRUE, quantiles = 2) + 
       ggplot2::scale_fill_gradientn(colours = colorMap,
                            values = valuesMap,
