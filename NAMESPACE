@@ -2,6 +2,7 @@
 
 export(addCustomSpatialUnits)
 export(calculateCustomNI)
+export(geomapNI)
 export(importMergeDataset_CoastOcean)
 export(listFunctionArguments)
 export(listIndicators_NIforEC)
