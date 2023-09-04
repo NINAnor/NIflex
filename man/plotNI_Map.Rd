@@ -5,13 +5,11 @@
 \title{Plot maps of custom index median, confidence interval, and displacement}
 \usage{
 plotNI_Map(
-  Index,
+  shp,
   year,
   OutputType,
   ecosystem = NULL,
   theme = NULL,
-  awBSunit = NULL,
-  shapeLibraryPath,
   plotMedian = TRUE,
   plotCI = TRUE,
   plotDisplacement = FALSE,
@@ -19,8 +17,8 @@ plotNI_Map(
 )
 }
 \arguments{
-\item{Index}{a list ontaining all information on the custom index. Object
-"CustomIndex" in the output of calculateCustomNI().}
+\item{shp}{an sf object containing geomapped summary statistics for the index in
+the specified year.}
 
 \item{year}{integer. Which year to plot maps for.}
 
@@ -37,15 +35,6 @@ of c("Skog", "Fjell", "Våtmark", "Åpent lavland", "Ferskvann", "Kystvann",
 should be plotted. Required when OutputType = "ThematicIndex". For currently
 supported thematic indices, see documentation of listIndicators_thematicIndex().}
 
-\item{awBSunit}{character. Optional argument that needs to be provided when
-OutputType = "CustomIndex" to determine which spatial units should be used
-for plotting. Can be any of c("Fjell", "Skog", "Våtmark", "Åpent lavland",
-"Ferskvann"), but note that the outcome is the same for all terrestrial
-ecosystems.}
-
-\item{shapeLibraryPath}{character. Path to the folder in which the shapefiles
-are deposited.}
-
 \item{plotMedian}{logical. If TRUE (default), plots index median.}
 
 \item{plotCI}{logical. If TRUE (default), plots index confidence interval.}
@@ -60,16 +49,16 @@ plots an interactive (zoomable) map.}
 one or two static or interactive maps of index summary metrics.
 }
 \description{
-This function was developed based on materials in the NIviz repository
-(https://github.com/NINAnor/NIviz).
-}
-\details{
-It allows to plot three types of summary metrics of calculated custom indices
-onto a map: median, spread of the confidence interval (= a measure of
-uncertainty), and the statistical displacement (an artifact resulting from
-indicator scaling that may affect the index estimates.)
+This function allows to plot three types of summary metrics of calculated
+custom indices onto a map: median, spread of the confidence interval (= a
+measure of uncertainty), and the statistical displacement (an artifact
+resulting from indicator scaling that may affect the index estimates.)
 At present, the function can plot any of these separately, or in pairs of two
 (but not all three simultaneously).
+}
+\details{
+#' This function was developed based on materials in the NIviz repository
+(https://github.com/NINAnor/NIviz).
 
 Plotting to map requires shapefiles for the spatial units used by the Nature
 Index for the different ecosystems and the different thematic indices.
