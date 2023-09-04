@@ -38,7 +38,8 @@
 #'
 #' @return an sf object containing geomapped summary statistics for the index in 
 #' the specified year.
-#'
+#' @export
+#' 
 #' @examples
 
 geomapNI <- function(Index, year, OutputType, 
