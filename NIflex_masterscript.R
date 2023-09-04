@@ -167,7 +167,32 @@ CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
                               saveSteps = FALSE)
   
 
+## Combine index summary statistics with geospatial data
+shapeLibraryPath <- "P:/41201611_naturindeks_2021_2023_vitenskapelig_ansvar/Shapefiles"
 
+if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
+  CustomNI_map <- geomapNI(Index = CustomNI$CustomIndex, 
+                           year = 2019, 
+                           OutputType = OutputType, 
+                           ecosystem = ecosystem_use,
+                           shapeLibraryPath = shapeLibraryPath)
+}
+
+if(OutputType == "ThematicIndex"){
+  CustomNI_map <- geomapNI(Index = CustomNI$CustomIndex, 
+                           year = 2019, 
+                           OutputType = OutputType, 
+                           theme = theme,
+                           shapeLibraryPath = shapeLibraryPath)
+}
+
+if(OutputType == "CustomIndex"){
+  CustomNI_map <- geomapNI(Index = CustomNI$CustomIndex, 
+                           year = 2019, 
+                           OutputType = OutputType, 
+                           awBSunit = funArguments$awBSunit,
+                           shapeLibraryPath = shapeLibraryPath)
+}
 
 #*************#
 # INDEX PLOTS #
@@ -196,34 +221,28 @@ plotNI_DensityRidgeTS(Index = Index,
                       allAreas = TRUE)
 
 ## Plot map
-shapeLibraryPath <- "P:/41201611_naturindeks_2021_2023_vitenskapelig_ansvar/Shapefiles"
-
 if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
-  plotNI_Map(Index = Index, 
+  plotNI_Map(shp = CustomNI_map, 
              year = 2019, 
              OutputType = OutputType, 
              ecosystem = ecosystem_use,
-             shapeLibraryPath = shapeLibraryPath,
              plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
              interactiveMap = FALSE)
 }
 
 if(OutputType == "ThematicIndex"){
-  plotNI_Map(Index = Index, 
+  plotNI_Map(shp = CustomNI_map, 
              year = 2019, 
              OutputType = OutputType, 
              theme = theme,
-             shapeLibraryPath = shapeLibraryPath,
              plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
              interactiveMap = FALSE)
 }
 
 if(OutputType == "CustomIndex"){
-  plotNI_Map(Index = Index, 
+  plotNI_Map(shp = CustomNI_map, 
              year = 2019, 
              OutputType = OutputType, 
-             awBSunit = funArguments$awBSunit,
-             shapeLibraryPath = shapeLibraryPath,
              plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
              interactiveMap = FALSE)
 }
