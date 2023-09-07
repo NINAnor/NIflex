@@ -41,6 +41,8 @@
 #' @examples
 
 selectDropIndicators <- function(DropIndMode = "pre-defined", OutputType = NULL, ecosystem = NULL, customList = NULL){
+
+  DropIndices <- NULL
   
   ## Check for validity of argument combinations
   if(!(DropIndMode %in% c("pre-defined", "custom"))){
