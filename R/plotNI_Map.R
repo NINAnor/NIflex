@@ -68,21 +68,24 @@ plotNI_Map <- function(shp, year, OutputType,
                 border.col = ifelse(interactiveMap, "white", "black"),
                 #style = "cont",
                 breaks = seq(0, 1, length.out = 11),
-                palette = pal1)
+                palette = pal1) + 
+    tmap::tm_layout(legend.position = c(0.75, 0.54))
   
   ## Plot map of CI widths (uncertainty)
   Map2 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "widthCI", 
                 border.col = "black",
                 breaks = seq(0, 0.25, length.out = 6),
-                palette = pal2)
+                palette = pal2) + 
+    tmap::tm_layout(legend.position = c(0.75, 0.54))
   
   ## Plot map of displacement
   Map3 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "displacement", 
                 border.col = "black",
                 breaks = seq(-0.105, 0, length.out = 8),
-                palette = pal3)
+                palette = pal3) + 
+    tmap::tm_layout(legend.position = c(0.75, 0.54))
   
   ## Optional: activate interactive map mode
   if(interactiveMap){
@@ -93,9 +96,6 @@ plotNI_Map <- function(shp, year, OutputType,
   
   ## Count number of maps to plot
   mapCount <- length(which(c(plotMedian, plotCI, plotDisplacement) == TRUE))
-  if(mapCount > 2){
-    stop("Plotting of up to two maps together is supported at the moment. Please set FALSE for at least one of the arguments 'plotMedian', 'plotCI', and 'plotDisplacement'.")
-  }
   
   ## Write map title
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
@@ -129,6 +129,18 @@ plotNI_Map <- function(shp, year, OutputType,
                            sync = TRUE,
                            widths = c(1, 1),
                            heights = c(1, 1))
+  }
+  
+  ## Return specified combination of maps (triple map scenario)
+  if(mapCount == 3){
+    outMap <- list(Map1, Map2, Map3)
+    
+    outMap <- tmap::tmap_arrange(outMap[[1]] + tmap::tm_layout(title = mapTitle), 
+                                 outMap[[2]] + tmap::tm_layout(title = mapTitle), 
+                                 outMap[[3]] + tmap::tm_layout(title = mapTitle), 
+                                 sync = TRUE,
+                                 widths = c(1, 1, 1),
+                                 heights = c(1, 1, 1))
   }
   
   return(outMap)
