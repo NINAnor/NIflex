@@ -57,7 +57,6 @@ selectDropIndicators <- function(DropIndMode = "pre-defined", OutputType = NULL,
   
   ## Write corresponding lists of indicator id's to drop
   
-  # TODO: Update exclusions for Nature Index prior to 2025 update
   # TODO: Update exclusions for Ecological condition after discussions with Anders
   
   if(DropIndMode == "custom"){
@@ -70,7 +69,7 @@ selectDropIndicators <- function(DropIndMode = "pre-defined", OutputType = NULL,
       
       # Nature index forest
       if(OutputType == "NatureIndex" & ecosystem == "Skog"){
-        DropIndices <- 155 # (lavhei)
+        DropIndices <- NULL
       }
       
       # Nature index mountain
@@ -80,7 +79,7 @@ selectDropIndicators <- function(DropIndMode = "pre-defined", OutputType = NULL,
       
       # Nature index wetlands
       if(OutputType == "NatureIndex" & ecosystem == "Våtmark"){
-        DropIndices <- 155 # (lavhei)
+        DropIndices <- NULL
       }
       
       # Nature index open lowlands
@@ -100,13 +99,12 @@ selectDropIndicators <- function(DropIndMode = "pre-defined", OutputType = NULL,
       
       # Nature index ocean
       if(OutputType == "NatureIndex" & ecosystem == "Hav"){
-        DropIndices <- 165 # (sei)
+        DropIndices <- NULL
       }
-      
       
       # Ecological condition forest
       if(OutputType == "EcologicalCondition" & ecosystem == "Skog"){
-        DropIndices <- 155 # (lavhei)
+        DropIndices <- NULL
       }
       
       # Ecological condition mountain
@@ -116,7 +114,7 @@ selectDropIndicators <- function(DropIndMode = "pre-defined", OutputType = NULL,
       
       # Ecological condition wetlands
       if(OutputType == "EcologicalCondition" & ecosystem == "Våtmark"){
-        DropIndices <- 155 # (lavhei)
+        DropIndices <- NULL
       }
       
       

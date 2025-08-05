@@ -21,15 +21,18 @@ NIdb_password <- Sys.getenv("NIDB_PASSWORD")
 #******************#
 
 ## Years
-years <- c("1990", "2000", "2010", "2014", "2019")
+years <- c("1990", "2000", "2010", "2014", "2019", "2024")
+
+## Year for map plots
+mapYear <- max(years)
 
 ## Missing value imputation
 #NAImputation <- TRUE # Yes
 NAImputation <- TRUE # No
 
 ## Key indicator weighing
-#KeyIndicators <- TRUE # Yes
-KeyIndicators <- FALSE # No
+KeyIndicators <- TRUE # Yes
+#KeyIndicators <- FALSE # No
 
 KeyWeight <- 0.5
 
@@ -46,16 +49,16 @@ norwegianNames <- TRUE # Yes
 #norwegianNames <- FALSE # No (English names instead)
 
 ## Output type
-#OutputType <- "NatureIndex"
+OutputType <- "NatureIndex"
 #OutputType <- "ThematicIndex"
 #OutputType <- "CustomIndex"
-OutputType <- "EcologicalCondition"
+#OutputType <- "EcologicalCondition"
 
 ## Nature Index ecosystem (optional)
 if(OutputType == "NatureIndex"){
-  #Ecosystem <- c("Forest", "Skog")
+  Ecosystem <- c("Forest", "Skog")
   #Ecosystem <- c("Mountain", "Fjell")
-  Ecosystem <- c("Wetlands", "Våtmark")
+  #Ecosystem <- c("Wetlands", "Våtmark")
   #Ecosystem <- c("OpenLowland", "Åpent lavland")
   #Ecosystem <- c("Freshwater", "Ferskvann")
   #Ecosystem <- c("Coast", "Kystvann")
@@ -164,15 +167,15 @@ CustomNI <- calculateCustomNI(ecosystem = ecosystem_use,
                               Diagnostics = Diagnostics,
                               TestRun = TestRun,
                               norwegianNames = norwegianNames,
-                              saveSteps = FALSE)
+                              saveSteps = TRUE)
   
 
 ## Combine index summary statistics with geospatial data
-shapeLibraryPath <- "P:/41201611_naturindeks_2021_2023_vitenskapelig_ansvar/Shapefiles"
+shapeLibraryPath <- "P:/412430_naturindeks/Beregninger/Shapefiles"
 
 if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
   CustomNI_map <- geomapNI(Index = CustomNI$CustomIndex, 
-                           year = 2019, 
+                           year = mapYear, 
                            OutputType = OutputType, 
                            ecosystem = ecosystem_use,
                            shapeLibraryPath = shapeLibraryPath)
@@ -180,7 +183,7 @@ if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
 
 if(OutputType == "ThematicIndex"){
   CustomNI_map <- geomapNI(Index = CustomNI$CustomIndex, 
-                           year = 2019, 
+                           year = mapYear, 
                            OutputType = OutputType, 
                            theme = theme,
                            shapeLibraryPath = shapeLibraryPath)
@@ -188,7 +191,7 @@ if(OutputType == "ThematicIndex"){
 
 if(OutputType == "CustomIndex"){
   CustomNI_map <- geomapNI(Index = CustomNI$CustomIndex, 
-                           year = 2019, 
+                           year = mapYear, 
                            OutputType = OutputType, 
                            awBSunit = funArguments$awBSunit,
                            shapeLibraryPath = shapeLibraryPath)
@@ -205,6 +208,15 @@ Index <- CustomNI$CustomIndex
 # Standard
 plot(Index$wholeArea, main = "Custom index", cex = 1, lwd = 2, shade = TRUE)
 summary(Index$wholeArea)
+
+# Standard extended
+plotNI_StandardTS(Index = Index,
+                  addAverage = TRUE,
+                  truncateY = TRUE)
+
+plotNI_StandardTS(Index = Index,
+                  addAverage = TRUE,
+                  truncateY = FALSE)
 
 # Density ridge plot
 plotNI_DensityRidgeTS(Index = Index, 
@@ -223,7 +235,7 @@ plotNI_DensityRidgeTS(Index = Index,
 ## Plot map
 if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
   plotNI_Map(shp = CustomNI_map, 
-             year = 2019, 
+             year = mapYear, 
              OutputType = OutputType, 
              ecosystem = ecosystem_use,
              plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
@@ -232,7 +244,7 @@ if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
 
 if(OutputType == "ThematicIndex"){
   plotNI_Map(shp = CustomNI_map, 
-             year = 2019, 
+             year = mapYear, 
              OutputType = OutputType, 
              theme = theme,
              plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
@@ -241,7 +253,7 @@ if(OutputType == "ThematicIndex"){
 
 if(OutputType == "CustomIndex"){
   plotNI_Map(shp = CustomNI_map, 
-             year = 2019, 
+             year = mapYear, 
              OutputType = OutputType, 
              plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
              interactiveMap = FALSE)
@@ -249,8 +261,13 @@ if(OutputType == "CustomIndex"){
 
 
 ## Plot indicator weights
-NIcalc::plotWeights(Index$wholeArea$'2019')
-NIcalc::plotWeights(Index$wholeArea$'2019', group = "troph")
+NIcalc::plotWeights(Index$wholeArea$'2024')
+NIcalc::plotWeights(Index$wholeArea$'2024', group = "troph")
+
+NIcalc::plotWeights(Index$wholeArea$'2024', allBars = TRUE)
+NIcalc::plotWeights(Index$wholeArea$'2024', group = "troph")
+
+
 NIcalc::summaryWeights(Index$wholeArea)
 
 
