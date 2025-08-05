@@ -206,6 +206,15 @@ Index <- CustomNI$CustomIndex
 plot(Index$wholeArea, main = "Custom index", cex = 1, lwd = 2, shade = TRUE)
 summary(Index$wholeArea)
 
+# Standard extended
+plotNI_StandardTS(Index = Index,
+                  addAverage = TRUE,
+                  truncateY = TRUE)
+
+plotNI_StandardTS(Index = Index,
+                  addAverage = TRUE,
+                  truncateY = FALSE)
+
 # Density ridge plot
 plotNI_DensityRidgeTS(Index = Index, 
                       OutputType = OutputType, 
