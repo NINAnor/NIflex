@@ -4,6 +4,7 @@
 #' 
 #' @param Index a list ontaining all information on the custom index. Object
 #' "CustomIndex" in the output of calculateCustomNI(). 
+#' @param plotTitle character. Title to display on top of plot.
 #' @param addAverage logical. If TRUE (default), a line for the area-averaged index is plotted together with area-specific estimates. 
 #' @param truncateY logical. If TRUE, the y axis of the plot will be truncated to only visualize the range of values relevant to the specific index. If FALSE (default), the y-axis will span the entire possible range from 0 to 1. 
 #'
@@ -12,7 +13,7 @@
 #'
 #' @examples
 #' 
-plotNI_StandardTS <- function(Index, addAverage = TRUE, truncateY = FALSE){
+plotNI_StandardTS <- function(Index, plotTitle, addAverage = TRUE, truncateY = FALSE){
   
   #-------------------#
   # Data reformatting #
@@ -73,21 +74,9 @@ plotNI_StandardTS <- function(Index, addAverage = TRUE, truncateY = FALSE){
   IndexData_sum <- IndexData_sum %>%
     dplyr::mutate(areaAgg = ifelse(Area == "All Norway", TRUE, FALSE))
 
-  ## Write plot title
-  if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
-    plotTitle <- ecosystem
-  }
-  if(OutputType == "ThematicIndex"){
-    plotTitle <- theme
-  }
-  if(OutputType == "CustomIndex"){
-    plotTitle <- "Custom index"
-  }
-  
   ## Define color palette
-  IndTS_cols <- c("#006964", paletteer::paletteer_c("grDevices::Sunset", length(areas))[-1])
-
-  #IndTS_cols <- c("#006964", paletteer::paletteer_c("pals::kovesi.isoluminant_cgo_80_c38", length(areas)-1))
+  #IndTS_cols <- c("#006964", paletteer::paletteer_c("grDevices::Sunset", length(areas))[-1])
+  IndTS_cols <- c("#006964", paletteer::paletteer_c("pals::kovesi.isoluminant_cgo_80_c38", length(areas)-1))
 
   if(!addAverage){
     IndTS_cols <- IndTS_cols[-1]
