@@ -166,9 +166,15 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
   ## Fixing ecosystem-specific key indicator status
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
     
-    if(ecosystem == "Skog"){
+    if(ecosystem %in% c("Skog", "Våtmark")){
+      
+      # Tamrein
       tamrein_idx  <- which(importData$indicators$name == "Tamrein")
       importData$indicators$keyElement[tamrein_idx] <- FALSE
+      
+      # Villrein
+      villrein_idx  <- which(importData$indicators$name == "Villrein")
+      importData$indicators$keyElement[villrein_idx] <- FALSE
     }
 
   }
