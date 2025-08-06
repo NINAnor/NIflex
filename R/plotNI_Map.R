@@ -65,27 +65,38 @@ plotNI_Map <- function(shp, year, OutputType,
   ## Plot map of median values
   Map1 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "medianValue", 
-                border.col = ifelse(interactiveMap, "white", "black"),
+                border.col = "black",
                 #style = "cont",
                 breaks = seq(0, 1, length.out = 11),
-                palette = pal1) + 
-    tmap::tm_layout(legend.position = c(0.75, 0.54))
-  
+                palette = pal1) 
+
   ## Plot map of CI widths (uncertainty)
   Map2 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "widthCI", 
                 border.col = "black",
                 breaks = seq(0, 0.25, length.out = 6),
-                palette = pal2) + 
-    tmap::tm_layout(legend.position = c(0.75, 0.54))
-  
+                palette = pal2) 
+
   ## Plot map of displacement
   Map3 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "displacement", 
                 border.col = "black",
                 breaks = seq(-0.105, 0, length.out = 8),
-                palette = pal3) + 
-    tmap::tm_layout(legend.position = c(0.75, 0.54))
+                palette = pal3) 
+
+  ## Fix legend positioning for plot mode
+  legend.coord <- c(0.75, 0.54)
+  
+  if(!interactiveMap){
+    Map1 <- Map1 +
+      tmap::tm_layout(legend.position = legend.coord)
+    
+    Map2 <- Map2 +
+      tmap::tm_layout(legend.position = legend.coord)
+    
+    Map3 <- Map3 +
+      tmap::tm_layout(legend.position = legend.coord)
+  }
   
   ## Optional: activate interactive map mode
   if(interactiveMap){
@@ -114,7 +125,7 @@ plotNI_Map <- function(shp, year, OutputType,
                                plotCI ~ list(Map2),
                                plotDisplacement ~ list(Map3))
     
-    outMap <- outMap[[1]] + tmap::tm_layout(title = mapTitle)
+    outMap <- outMap[[1]] + tmap::tm_title(mapTitle)
   }
 
   
@@ -124,8 +135,8 @@ plotNI_Map <- function(shp, year, OutputType,
                                plotMedian & plotDisplacement ~ list(Map1, Map3),
                                plotCI & plotDisplacement ~ list(Map2, Map3))
     
-    outMap <- tmap::tmap_arrange(outMap[[1]] + tmap::tm_layout(title = mapTitle), 
-                                 outMap[[2]] + tmap::tm_layout(title = mapTitle), 
+    outMap <- tmap::tmap_arrange(outMap[[1]] + tmap::tm_title(mapTitle), 
+                                 outMap[[2]] + tmap::tm_title(mapTitle), 
                            sync = TRUE,
                            widths = c(1, 1),
                            heights = c(1, 1))
@@ -135,9 +146,9 @@ plotNI_Map <- function(shp, year, OutputType,
   if(mapCount == 3){
     outMap <- list(Map1, Map2, Map3)
     
-    outMap <- tmap::tmap_arrange(outMap[[1]] + tmap::tm_layout(title = mapTitle), 
-                                 outMap[[2]] + tmap::tm_layout(title = mapTitle), 
-                                 outMap[[3]] + tmap::tm_layout(title = mapTitle), 
+    outMap <- tmap::tmap_arrange(outMap[[1]] + tmap::tm_title(mapTitle), 
+                                 outMap[[2]] + tmap::tm_title(mapTitle), 
+                                 outMap[[3]] + tmap::tm_title(mapTitle), 
                                  sync = TRUE,
                                  widths = c(1, 1, 1),
                                  heights = c(1, 1, 1))
