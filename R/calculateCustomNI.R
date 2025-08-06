@@ -163,6 +163,17 @@ calculateCustomNI <- function(ecosystem = NULL, indicators = NULL, theme = "None
     importData$indicators <- importData$indicators[!(importData$indicators$id %in% dropInd), ]
   }
   
+  ## Fixing ecosystem-specific key indicator status
+  if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
+    
+    if(ecosystem == "Skog"){
+      tamrein_idx  <- which(importData$indicators$name == "Tamrein")
+      importData$indicators$keyElement[tamrein_idx] <- FALSE
+    }
+
+  }
+  
+  
   ## Optional: save step
   if(saveSteps){
     stepData <- list(indexInfo = indexInfo,
