@@ -85,7 +85,7 @@ plotNI_Map <- function(shp, year, OutputType,
                 palette = pal3) 
 
   ## Fix legend positioning for plot mode
-  legend.coord <- c(0.75, 0.54)
+  legend.coord <- c(0.65, 0.6)
   
   if(!interactiveMap){
     Map1 <- Map1 +
