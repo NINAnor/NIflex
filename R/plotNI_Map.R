@@ -60,7 +60,7 @@ plotNI_Map <- function(shp, year, OutputType,
   ## Set up colour palettes with 10 colours
   pal1 <- grDevices::colorRampPalette(IndMap_cols)(10)
   pal2 <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 9, name = "Reds"))(5)
-  pal3 <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 9, name = "Purples"))(5)
+  pal3 <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 9, name = "PRGn"))(5)
   
   ## Plot map of median values
   Map1 <- tmap::tm_shape(shp) +
@@ -83,7 +83,7 @@ plotNI_Map <- function(shp, year, OutputType,
                 border.col = "black",
                 breaks = seq(-0.105, 0, length.out = 8),
                 palette = pal3) 
-
+  
   ## Fix legend positioning for plot mode
   legend.coord <- c(0.65, 0.6)
   
