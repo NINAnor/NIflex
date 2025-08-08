@@ -48,6 +48,9 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
   
   names(Index) <- areas
   
+  ## Check if ecosystem = ocean
+  oceanEco <- ifelse(ecosystem == "Hav", TRUE, FALSE)
+  
   ## List years
   years <- names(Index[[1]])
   
@@ -65,10 +68,42 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
     }
   }
   
+  ## Add display area names
+  if(oceanEco){
+    IndexData <- IndexData %>%
+      dplyr::mutate(Area_display = dplyr::case_when(Area == "wholeArea" ~ "All seas",
+                                                    Area == "E" ~ "Skagerrak",
+                                                    Area == "S" ~ "North Sea",
+                                                    Area == "C" ~ "Norwegian Sea",
+                                                    Area == "N" ~ "Barents Sea",
+                                                    TRUE ~ Area))
+  }else{
+    IndexData <- IndexData %>%
+      dplyr::mutate(Area_display = dplyr::case_when(Area == "wholeArea" ~ "All Norway",
+                                                    Area == "E" ~ "Eastern Norway",
+                                                    Area == "S" ~ "Southern Norway",
+                                                    Area == "W" ~ "Western Norway",
+                                                    Area == "N" ~ "Northern Norway",
+                                                    Area == "C" ~ "Central Norway",
+                                                    TRUE ~ Area))
+  }
   
+  selectedArea_display <- IndexData$Area_display[which(IndexData$Area == selectedArea)][1]
+    
   ## Write plot title
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
-    plotTitle <- ecosystem
+    
+    ecosystem_eng <- dplyr::case_when(
+      ecosystem == "Skog" ~ "Forest",
+      ecosystem == "Fjell" ~ "Mountain",
+      ecosystem == "Våtmark" ~ "Wetlands",
+      ecosystem == "Åpent lavland" ~ "Open lowland",
+      ecosystem == "Ferskvann" ~ "Freshwater",
+      ecosystem == "Kystvann" ~ "Coast",
+      ecosystem == "Hav" ~ "Ocean"
+    )
+    
+    plotTitle <- ecosystem_eng
   }
   if(OutputType == "ThematicIndex"){
     plotTitle <- theme
@@ -108,7 +143,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
                            values = valuesMap,
                            limits = c(0, 1)) +
       ggplot2::scale_y_discrete(limits = rev) + 
-      ggplot2::ggtitle(paste0(plotTitle, " (area: ", selectedArea, ")")) + 
+      ggplot2::ggtitle(paste0(plotTitle, " (", selectedArea_display, ")")) + 
       ggplot2::xlab("Index value") + ggplot2::ylab("") + 
       ggplot2::theme_classic() + 
       ggplot2::theme(legend.title = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5),
@@ -137,7 +172,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
                            values = valuesMap,
                            limits = c(0, 1)) +
       ggplot2::scale_y_discrete(limits = rev) + 
-      ggplot2::facet_wrap(~ Area) +
+      ggplot2::facet_wrap(~ Area_display) +
       ggplot2::ggtitle(plotTitle) + 
       ggplot2::xlab("Index value") + ggplot2::ylab("") + 
       ggplot2::theme_classic() + 
