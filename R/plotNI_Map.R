@@ -36,6 +36,10 @@
 #' @param plotCI logical. If TRUE (default), plots index confidence interval. 
 #' @param plotDisplacement logical. If TRUE (default = FALSE) plots index 
 #' dislocation. 
+#' @param limits_CIwidth vector of length 2 specifying lower and upper bound for 
+#' color scale for CI width.
+#' @param limits_displ vector of length 2 specifying lower and upper bound for 
+#' color scale for displacement.
 #' @param interactiveMap logical. If FALSE (default) plots a static map. If TRUE,
 #' plots an interactive (zoomable) map. 
 #'
@@ -46,7 +50,10 @@
 
 plotNI_Map <- function(shp, year, OutputType, 
                        ecosystem = NULL, theme = NULL, 
-                       plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, interactiveMap = FALSE){
+                       plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
+                       limits_CIwidth = c(0, 0.3), 
+                       limits_displ = c(-0.11, 0.01),
+                       interactiveMap = FALSE){
   
   
   #-----------------#
@@ -57,11 +64,19 @@ plotNI_Map <- function(shp, year, OutputType,
   IndMap_cols <- c("#A44B4B", "#EA4B4B", "#FD7F4B", "#FDC44B", "#F0FD58",
                    "#A9FD9F", "#4BCFFD", "#4B8AFD", "#4B4BF6", "#4B4BAF")
 
-  ## Set up colour palettes with 10 colours
+  ## Set up colour palettes with 5-10 colours
   pal1 <- grDevices::colorRampPalette(IndMap_cols)(10)
   pal2 <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 9, name = "Reds"))(5)
-  pal3 <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 9, name = "PRGn"))(5)
   
+  pal3_breaks <- seq(limits_displ[1], limits_displ[2], length.out = 7)
+  pal3_breaks[which(abs(pal3_breaks) == min(abs(pal3_breaks)))] <- 0
+  
+  n_negative <- length(which(pal3_breaks < 0))
+  n_positive <- length(which(pal3_breaks > 0))
+  
+  pal3 <- grDevices::colorRampPalette(
+    RColorBrewer::brewer.pal(n = (2*n_negative)+1, name = "PRGn"))((2*n_negative)+1)[c(1:n_negative, n_negative + (1:n_positive))]
+
   ## Plot map of median values
   Map1 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "medianValue", 
@@ -74,14 +89,14 @@ plotNI_Map <- function(shp, year, OutputType,
   Map2 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "widthCI", 
                 border.col = "black",
-                breaks = seq(0, 0.25, length.out = 6),
+                breaks = seq(limits_CIwidth[1], limits_CIwidth[2], length.out = 6),
                 palette = pal2) 
 
   ## Plot map of displacement
   Map3 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "displacement", 
                 border.col = "black",
-                breaks = seq(-0.105, 0, length.out = 8),
+                breaks = seq(limits_displ[1], limits_displ[2], length.out = 6),
                 palette = pal3) 
   
   ## Fix legend positioning for plot mode
