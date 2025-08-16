@@ -94,11 +94,15 @@ plotNI_StandardTS <- function(Index, plotTitle,
     dplyr::mutate(areaAgg = ifelse(Area %in% c("All Norway", "All seas"), TRUE, FALSE))
 
   ## Define color palette
-  #IndTS_cols <- c("#006964", paletteer::paletteer_c("grDevices::Sunset", length(areas))[-1])
-  IndTS_cols <- c("#006964", paletteer::paletteer_c("pals::kovesi.isoluminant_cgo_80_c38", length(areas)-1))
+  #IndTS_cols <- c(paletteer::paletteer_c("grDevices::Sunset", length(areas))[-1])
+  IndTS_cols <- c(paletteer::paletteer_c("pals::kovesi.isoluminant_cgo_80_c38", length(areas)-1))
 
-  if(!addAverage){
-    IndTS_cols <- IndTS_cols[-1]
+  allNorway_idx <- which(unique(sort(IndexData_sum$Area)) %in% c("All Norway", "All seas"))
+  
+  if(length(allNorway_idx) > 0){
+    IndTS_cols <- c(IndTS_cols[1:(allNorway_idx-1)],
+                    "#006964",
+                    IndTS_cols[(allNorway_idx):length(IndTS_cols)])
   }
   
   #-----------------#
