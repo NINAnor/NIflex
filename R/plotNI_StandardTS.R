@@ -99,10 +99,15 @@ plotNI_StandardTS <- function(Index, plotTitle,
 
   allNorway_idx <- which(unique(sort(IndexData_sum$Area)) %in% c("All Norway", "All seas"))
   
-  if(length(allNorway_idx) > 0){
-    IndTS_cols <- c(IndTS_cols[1:(allNorway_idx-1)],
-                    "#006964",
-                    IndTS_cols[(allNorway_idx):length(IndTS_cols)])
+  if(length(allNorway_idx) == 1){
+    
+    if(allNorway_idx == 1){
+      IndTS_cols <- c("#006964", IndTS_cols)
+    }else{
+      IndTS_cols <- c(IndTS_cols[1:(allNorway_idx-1)],
+                      "#006964",
+                      IndTS_cols[(allNorway_idx):length(IndTS_cols)])
+    }
   }
   
   #-----------------#
