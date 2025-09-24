@@ -5,6 +5,7 @@
 #' @param Index a list ontaining all information on the custom index. Object
 #' "CustomIndex" in the output of calculateCustomNI(). 
 #' @param plotTitle character. Title to display on top of plot.
+#' @param plotYears numerical vector. Optional list of years for which to show data in plot. If not provided, plots all years present in input.
 #' @param addAverage logical. If TRUE (default), a line for the area-averaged index is plotted together with area-specific estimates. 
 #' @param onlyAverage logical. If TRUE, returns a plot of only average values (not including area-specific index values). The default is FALSE.
 #' @param addRibbon logical. If TRUE (default), display a semi-transparent ribbon in addition to error bar for visualizing uncertainty. 
@@ -15,7 +16,7 @@
 #'
 #' @examples
 #' 
-plotNI_StandardTS <- function(Index, plotTitle, 
+plotNI_StandardTS <- function(Index, plotTitle, plotYears = NULL,
                               addAverage = TRUE, onlyAverage = FALSE,
                               addRibbon = TRUE, truncateY = FALSE){
   
@@ -34,6 +35,12 @@ plotNI_StandardTS <- function(Index, plotTitle,
   
   ## Check if ecosystem = ocean
   oceanEco <- ifelse(Index$wholeArea[[1]]$calculationParameters$awBSunit == "Hav", TRUE, FALSE)
+  
+  if(Index$wholeArea[[1]]$calculationParameters$awBSunit == "sumEco"){
+    if(any(c("Havbunn", "Hav-pelagisk") %in% colnames(Index$wholeArea[[1]]$indicatorData))){
+      oceanEco <- TRUE
+    }
+  }
   
   ## List years
   years <- names(Index[[1]])
@@ -61,6 +68,17 @@ plotNI_StandardTS <- function(Index, plotTitle,
                      .groups = "keep") %>%
     dplyr::ungroup()
   
+  
+  ## If specified: subset to relevant years
+  if(!is.null(plotYears)){
+    IndexData_sum <- IndexData_sum %>%
+      dplyr::filter(Year %in% plotYears)
+  }
+  
+  ## Drop NAs camouflaged as 0's (assumes that there are no "TRUE" 0's)
+  IndexData_sum <- IndexData_sum %>%
+    dplyr::filter(!(median == 0 & lCI == 0 & uCI == 0))
+  
   ## Assign area names and convert year to number
   if(oceanEco){
     IndexData_sum <- IndexData_sum %>%
@@ -71,6 +89,14 @@ plotNI_StandardTS <- function(Index, plotTitle,
                                             Area == "N" ~ "Barents Sea",
                                             TRUE ~ Area),
                     Year = as.numeric(Year))
+    
+    if("W" %in% IndexData_sum$Area){
+      IndexData_sum <- IndexData_sum %>%
+        dplyr::mutate(Area = dplyr::case_when(Area == "W" ~ "North Sea (W)",
+                                              Area == "North Sea" ~ "North Sea (S)",
+                                              TRUE ~ Area))
+    }
+    
   }else{
     IndexData_sum <- IndexData_sum %>%
       dplyr::mutate(Area = dplyr::case_when(Area == "wholeArea" ~ "All Norway",
@@ -142,7 +168,11 @@ plotNI_StandardTS <- function(Index, plotTitle,
       ggplot2::scale_x_continuous(breaks = availYears, labels = availYears) + 
       ggplot2::theme_classic() + 
       ggplot2::theme(panel.grid.major.y = ggplot2::element_line(color = "grey80"),
-                     panel.grid.major.x = ggplot2::element_line(color = "grey80", linetype = "dotted"))
+                     panel.grid.major.x = ggplot2::element_line(color = "grey80", linetype = "dotted")) + 
+      ggplot2::guides(color = guide_legend(order = 1),
+                      fill = guide_legend(order = 1),
+                      shape = guide_legend(order = 2),
+                      linetype = guide_legend(order = 2))
 
   }else{
     outPlot <- ggplot2::ggplot(IndexData_sum, ggplot2::aes(x = .data$Year, y = .data$median, color = Area)) +
@@ -157,7 +187,11 @@ plotNI_StandardTS <- function(Index, plotTitle,
       ggplot2::scale_x_continuous(breaks = availYears, labels = availYears) + 
       ggplot2::theme_classic() + 
       ggplot2::theme(panel.grid.major.y = ggplot2::element_line(color = "grey80"),
-                     panel.grid.major.x = ggplot2::element_line(color = "grey80", linetype = "dotted"))
+                     panel.grid.major.x = ggplot2::element_line(color = "grey80", linetype = "dotted")) + 
+      ggplot2::guides(color = guide_legend(order = 1),
+                      fill = guide_legend(order = 1),
+                      shape = guide_legend(order = 2),
+                      linetype = guide_legend(order = 2))
     
   }
   
