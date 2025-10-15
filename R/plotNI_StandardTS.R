@@ -10,6 +10,7 @@
 #' @param onlyAverage logical. If TRUE, returns a plot of only average values (not including area-specific index values). The default is FALSE.
 #' @param addRibbon logical. If TRUE (default), display a semi-transparent ribbon in addition to error bar for visualizing uncertainty. 
 #' @param truncateY logical. If TRUE, the y axis of the plot will be truncated to only visualize the range of values relevant to the specific index. If FALSE (default), the y-axis will span the entire possible range from 0 to 1. 
+#' @param norwegian logical. If TRUE, uses Norwegian language for plot annotation. If FALSE (default), uses English. 
 #'
 #' @returns a time series plot. 
 #' @export
@@ -18,7 +19,8 @@
 #' 
 plotNI_StandardTS <- function(Index, plotTitle, plotYears = NULL,
                               addAverage = TRUE, onlyAverage = FALSE,
-                              addRibbon = TRUE, truncateY = FALSE){
+                              addRibbon = TRUE, truncateY = FALSE,
+                              norwegian = FALSE){
   
   #-------------------#
   # Data reformatting #
@@ -136,6 +138,43 @@ plotNI_StandardTS <- function(Index, plotTitle, plotYears = NULL,
     }
   }
   
+  ## Optional: translate area names to Norwegian
+  if(norwegian){
+    
+    # Translate names
+    IndexData_sum <- IndexData_sum %>%
+      dplyr::mutate(Area = dplyr::case_when(Area == "All Norway" ~ "Hele Norge",
+                                            Area == "Eastern Norway" ~ "Øst",
+                                            Area == "Southern Norway" ~ "Sør",
+                                            Area == "Western Norway" ~ "Vest",
+                                            Area == "Northern Norway" ~ "Nord",
+                                            Area == "Central Norway" ~ "Midt",
+                                            Area == "All seas" ~ "Alle havområder",
+                                            Area == "Skagerrak" ~ "Skagerrak",
+                                            Area == "North Sea" ~ "Nordsjøen",
+                                            Area == "Norwegian Sea" ~ "Norskehavet",
+                                            Area == "Barents Sea" ~ "Barentshavet",
+                                            TRUE ~ Area))
+  }
+  
+  ## Set strings for plot annotation
+  
+  # Area legend title
+  areaLegend <- dplyr::case_when(!norwegian ~ "Area",
+                                 oceanEco ~ "Havområde",
+                                 TRUE ~ "Landsdel")
+  # Axis labels
+  xlab_name <- ifelse(norwegian, "År", "Year")
+  ylab_name <- ifelse(norwegian, "Indeksverdi", "Index value")
+  
+  # Index types
+  if(norwegian){
+    indType_names <- c("areal-spesifikk", "areal-aggregert")
+  }else{
+    indType_names <- c("area-specific", "area-aggregated")
+  }
+  
+  
   #-----------------#
   # Multi-area plot #
   #-----------------#
@@ -158,13 +197,13 @@ plotNI_StandardTS <- function(Index, plotTitle, plotYears = NULL,
       ggplot2::geom_line(ggplot2::aes(linetype = areaAgg)) + 
       ggplot2::geom_errorbar(ggplot2::aes(ymin = .data$lCI, ymax = .data$uCI), alpha = transp_errorbar, width = 0.5) + 
       ggplot2::geom_point(ggplot2::aes(shape = areaAgg), size = 3) +
-      ggplot2::scale_color_manual(values = IndTS_cols) + 
-      ggplot2::scale_fill_manual(values = IndTS_cols) + 
+      ggplot2::scale_color_manual(values = IndTS_cols, name = areaLegend) + 
+      ggplot2::scale_fill_manual(values = IndTS_cols, name = areaLegend) + 
       ggplot2::scale_alpha_manual(values = c(transp_ribbon, transp_ribbon*2), guide = "none") + 
-      ggplot2::scale_shape_manual(values = c(19, 15), name = "", labels = c("area-specific", "area-aggregated")) + 
-      ggplot2::scale_linetype_manual(values = c("dashed", "solid"), name = "", labels = c("area-specific", "area-aggregated")) + 
+      ggplot2::scale_shape_manual(values = c(19, 15), name = "", labels = indType_names) + 
+      ggplot2::scale_linetype_manual(values = c("dashed", "solid"), name = "", labels = indType_names) + 
       ggplot2::ggtitle(plotTitle) + 
-      ggplot2::xlab("Year") + ggplot2::ylab("Index value") + 
+      ggplot2::xlab(xlab_name) + ggplot2::ylab(ylab_name) + 
       ggplot2::scale_x_continuous(breaks = availYears, labels = availYears) + 
       ggplot2::theme_classic() + 
       ggplot2::theme(panel.grid.major.y = ggplot2::element_line(color = "grey80"),
@@ -180,10 +219,10 @@ plotNI_StandardTS <- function(Index, plotTitle, plotYears = NULL,
       ggplot2::geom_line() + 
       ggplot2::geom_errorbar(ggplot2::aes(ymin = .data$lCI, ymax = .data$uCI), alpha = transp_errorbar, width = 0.5) + 
       ggplot2::geom_point(shape = 19, size = 3) +
-      ggplot2::scale_color_manual(values = IndTS_cols) + 
-      ggplot2::scale_fill_manual(values = IndTS_cols) + 
+      ggplot2::scale_color_manual(values = IndTS_cols, name = areaLegend) + 
+      ggplot2::scale_fill_manual(values = IndTS_cols, name = areaLegend) + 
       ggplot2::ggtitle(plotTitle) + 
-      ggplot2::xlab("Year") + ggplot2::ylab("Index value") + 
+      ggplot2::xlab(xlab_name) + ggplot2::ylab(ylab_name) + 
       ggplot2::scale_x_continuous(breaks = availYears, labels = availYears) + 
       ggplot2::theme_classic() + 
       ggplot2::theme(panel.grid.major.y = ggplot2::element_line(color = "grey80"),
@@ -204,9 +243,9 @@ plotNI_StandardTS <- function(Index, plotTitle, plotYears = NULL,
       ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lCI, ymax = .data$uCI), fill = "#006964", alpha = transp_ribbon*2, color = NA) + 
       ggplot2::geom_line(color = "#006964") + 
       ggplot2::geom_errorbar(ggplot2::aes(ymin = .data$lCI, ymax = .data$uCI), color = "#006964", alpha = transp_errorbar, width = 0.5) + 
-      ggplot2::geom_point(shape = 15, size = 3) +
+      ggplot2::geom_point(shape = 15, size = 3, color = "#006964") +
       ggplot2::ggtitle(plotTitle) + 
-      ggplot2::xlab("Year") + ggplot2::ylab("Index value") + 
+      ggplot2::xlab(xlab_name) + ggplot2::ylab(ylab_name) + 
       ggplot2::scale_x_continuous(breaks = availYears, labels = availYears) + 
       ggplot2::ylim(min(IndexData_sum$lCI), max(IndexData_sum$uCI)) + 
       ggplot2::theme_classic() + 

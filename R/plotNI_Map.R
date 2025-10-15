@@ -40,6 +40,7 @@
 #' color scale for CI width.
 #' @param limits_displ vector of length 2 specifying lower and upper bound for 
 #' color scale for displacement.
+#' @param norwegian logical. If TRUE, uses Norwegian language for plot annotation. If FALSE (default), uses English. 
 #' @param interactiveMap logical. If FALSE (default) plots a static map. If TRUE,
 #' plots an interactive (zoomable) map. 
 #'
@@ -53,17 +54,18 @@ plotNI_Map <- function(shp, year, OutputType,
                        plotMedian = TRUE, plotCI = TRUE, plotDisplacement = FALSE, 
                        limits_CIwidth = c(0, 0.3), 
                        limits_displ = c(-0.11, 0.01),
+                       norwegian = FALSE,
                        interactiveMap = FALSE){
   
   
   #-----------------#
   # Plotting to map #
   #-----------------#
-
+  
   ## Define color palette for Nature Index maps
   IndMap_cols <- c("#A44B4B", "#EA4B4B", "#FD7F4B", "#FDC44B", "#F0FD58",
                    "#A9FD9F", "#4BCFFD", "#4B8AFD", "#4B4BF6", "#4B4BAF")
-
+  
   ## Set up colour palettes with 5-10 colours
   pal1 <- grDevices::colorRampPalette(IndMap_cols)(10)
   pal2 <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 9, name = "Reds"))(5)
@@ -76,28 +78,42 @@ plotNI_Map <- function(shp, year, OutputType,
   
   pal3 <- grDevices::colorRampPalette(
     RColorBrewer::brewer.pal(n = (2*n_negative)+1, name = "PRGn"))((2*n_negative)+1)[c(1:n_negative, n_negative + (1:n_positive))]
-
+  
+  
+  ## Set up strings for plot annotation
+  naLabel <- ifelse(norwegian, "Ingen verdi", "No value")
+  
+  median_label <- "Median"
+  CI_label <- ifelse(norwegian, "Bredde KI", "CI width")
+  displ_label <- ifelse(norwegian, "Forskyving", "Displacement")
+  
   ## Plot map of median values
   Map1 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "medianValue", 
-                border.col = "black",
-                #style = "cont",
-                breaks = seq(0, 1, length.out = 11),
-                palette = pal1) 
-
+                      title = median_label,
+                      border.col = "black",
+                      #style = "cont",
+                      breaks = seq(0, 1, length.out = 11),
+                      palette = pal1,
+                      textNA = naLabel) 
+  
   ## Plot map of CI widths (uncertainty)
   Map2 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "widthCI", 
-                border.col = "black",
-                breaks = seq(limits_CIwidth[1], limits_CIwidth[2], length.out = 6),
-                palette = pal2) 
-
+                      title = CI_label,
+                      border.col = "black",
+                      breaks = seq(limits_CIwidth[1], limits_CIwidth[2], length.out = 6),
+                      palette = pal2,
+                      textNA = naLabel) 
+  
   ## Plot map of displacement
   Map3 <- tmap::tm_shape(shp) +
     tmap::tm_polygons(col = "displacement", 
-                border.col = "black",
-                breaks = seq(limits_displ[1], limits_displ[2], length.out = 6),
-                palette = pal3) 
+                      title = displ_label,
+                      border.col = "black",
+                      breaks = seq(limits_displ[1], limits_displ[2], length.out = 6),
+                      palette = pal3,
+                      textNA = naLabel) 
   
   ## Fix legend positioning for plot mode
   legend.coord <- c(0.65, 0.6)
@@ -142,7 +158,7 @@ plotNI_Map <- function(shp, year, OutputType,
     
     outMap <- outMap[[1]] + tmap::tm_title(mapTitle)
   }
-
+  
   
   ## Return specified combination of maps (double map scenario)
   if(mapCount == 2){
@@ -152,9 +168,9 @@ plotNI_Map <- function(shp, year, OutputType,
     
     outMap <- tmap::tmap_arrange(outMap[[1]] + tmap::tm_title(mapTitle), 
                                  outMap[[2]] + tmap::tm_title(mapTitle), 
-                           sync = TRUE,
-                           widths = c(1, 1),
-                           heights = c(1, 1))
+                                 sync = TRUE,
+                                 widths = c(1, 1),
+                                 heights = c(1, 1))
   }
   
   ## Return specified combination of maps (triple map scenario)
