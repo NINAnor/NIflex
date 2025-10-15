@@ -25,7 +25,8 @@
 #' panel plot with one panel per area available. 
 #' @param selectedArea character. Name of the area for which to plot. Can be any
 #' of the list object names of argument "Index". The default is "wholeArea". 
-#'
+#' @param norwegian logical. If TRUE, uses Norwegian language for plot annotation. If FALSE (default), uses English. 
+#' 
 #' @return a density ridge time-series plot. 
 #' @export
 #'
@@ -33,7 +34,8 @@
 
 plotNI_DensityRidgeTS <- function(Index, OutputType, 
                                   ecosystem = NULL, theme = NULL,
-                                  allAreas = FALSE, selectedArea  = "wholeArea"){
+                                  allAreas = FALSE, selectedArea  = "wholeArea",
+                                  norwegian = FALSE){
   
   #-------------------#
   # Data reformatting #
@@ -88,7 +90,6 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
                                                     TRUE ~ Area))
   }
   
-  selectedArea_display <- IndexData$Area_display[which(IndexData$Area == selectedArea)][1]
     
   ## Write plot title
   if(OutputType %in% c("NatureIndex", "EcologicalCondition")){
@@ -103,7 +104,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
       ecosystem == "Hav" ~ "Ocean"
     )
     
-    plotTitle <- ecosystem_eng
+    plotTitle <- ifelse(norwegian, ecosystem, ecosystem_eng)
   }
   if(OutputType == "ThematicIndex"){
     plotTitle <- theme
@@ -111,6 +112,27 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
   if(OutputType == "CustomIndex"){
     plotTitle <- "Custom index"
   }
+  
+  ## Optional: translate area and axis names to Norwegian
+  if(norwegian){
+    
+    # Translate names
+    IndexData <- IndexData %>%
+      dplyr::mutate(Area_display = dplyr::case_when(Area_display == "All Norway" ~ "Hele Norge",
+                                                    Area_display == "Eastern Norway" ~ "Øst",
+                                                    Area_display == "Southern Norway" ~ "Sør",
+                                                    Area_display == "Western Norway" ~ "Vest",
+                                                    Area_display == "Northern Norway" ~ "Nord",
+                                                    Area_display == "Central Norway" ~ "Midt",
+                                                    Area_display == "All seas" ~ "Alle havområder",
+                                                    Area_display == "Skagerrak" ~ "Skagerrak",
+                                                    Area_display == "North Sea" ~ "Nordsjøen",
+                                                    Area_display == "Norwegian Sea" ~ "Norskehavet",
+                                                    Area_display == "Barents Sea" ~ "Barentshavet",
+                                                    TRUE ~ Area_display))
+  }
+  
+  xlab_name <- ifelse(norwegian, "Indeksverdi", "Index value")
   
   ## Define color palette for Nature Index maps
   IndMap_cols <- c("#A44B4B", "#EA4B4B", "#FD7F4B", "#FDC44B", "#F0FD58",
@@ -130,6 +152,9 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
     ## Subset data to selected area
     IndexData.sub <- subset(IndexData, IndexData$Area == selectedArea)
     
+    ## Select display area name
+    selectedArea_display <- IndexData$Area_display[which(IndexData$Area == selectedArea)][1]
+    
     ## Plot density ridge time series for data subset
     
     # Set mapping for custom color scale
@@ -144,7 +169,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
                            limits = c(0, 1)) +
       ggplot2::scale_y_discrete(limits = rev) + 
       ggplot2::ggtitle(paste0(plotTitle, " (", selectedArea_display, ")")) + 
-      ggplot2::xlab("Index value") + ggplot2::ylab("") + 
+      ggplot2::xlab(xlab_name) + ggplot2::ylab("") + 
       ggplot2::theme_classic() + 
       ggplot2::theme(legend.title = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5),
             axis.line.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(),
@@ -174,7 +199,7 @@ plotNI_DensityRidgeTS <- function(Index, OutputType,
       ggplot2::scale_y_discrete(limits = rev) + 
       ggplot2::facet_wrap(~ Area_display) +
       ggplot2::ggtitle(plotTitle) + 
-      ggplot2::xlab("Index value") + ggplot2::ylab("") + 
+      ggplot2::xlab(xlab_name) + ggplot2::ylab("") + 
       ggplot2::theme_classic() + 
       ggplot2::theme(legend.title = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5),
             axis.line.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(),
