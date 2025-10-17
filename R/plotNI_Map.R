@@ -83,37 +83,57 @@ plotNI_Map <- function(shp, year, OutputType,
   ## Set up strings for plot annotation
   naLabel <- ifelse(norwegian, "Ingen verdi", "No value")
   
-  median_label <- "Median"
+  median_label <- ifelse(norwegian, "Indeks", "Index")
   CI_label <- ifelse(norwegian, "Bredde KI", "CI width")
   displ_label <- ifelse(norwegian, "Forskyving", "Displacement")
   
+  ## Plot base map
+  BaseMap <- tmap::tm_shape(shp)
+  
   ## Plot map of median values
-  Map1 <- tmap::tm_shape(shp) +
-    tmap::tm_polygons(col = "medianValue", 
-                      title = median_label,
-                      border.col = "black",
-                      #style = "cont",
-                      breaks = seq(0, 1, length.out = 11),
-                      palette = pal1,
-                      textNA = naLabel) 
+  breaks_Median <- seq(0, 1, length.out = 11)
+  labels_Median <- paste0(breaks_Median[1:10], " - ", breaks_Median[2:11])
+  
+  Map1 <- BaseMap +
+    tmap::tm_polygons(fill = "medianValue",
+                      fill.scale = tmap::tm_scale_intervals(
+                        n = 10,
+                        style = "fixed",
+                        breaks = breaks_Median,
+                        values = pal1,
+                        labels = labels_Median),
+                      fill.legend = tmap::tm_legend(title = median_label)
+    )
   
   ## Plot map of CI widths (uncertainty)
-  Map2 <- tmap::tm_shape(shp) +
-    tmap::tm_polygons(col = "widthCI", 
-                      title = CI_label,
-                      border.col = "black",
-                      breaks = seq(limits_CIwidth[1], limits_CIwidth[2], length.out = 6),
-                      palette = pal2,
-                      textNA = naLabel) 
+  breaks_CI <- seq(limits_CIwidth[1], limits_CIwidth[2], length.out = 6)
+  labels_CI <- paste0(breaks_CI[1:5], " - ", breaks_CI[2:6])
+  
+  Map2 <- BaseMap +
+    tmap::tm_polygons(fill = "widthCI",
+                      fill.scale = tmap::tm_scale_intervals(
+                        n = 6,
+                        style = "fixed",
+                        breaks = breaks_CI,
+                        values = pal2,
+                        labels = labels_CI),
+                      fill.legend = tmap::tm_legend(title = CI_label)
+    )
   
   ## Plot map of displacement
-  Map3 <- tmap::tm_shape(shp) +
-    tmap::tm_polygons(col = "displacement", 
-                      title = displ_label,
-                      border.col = "black",
-                      breaks = seq(limits_displ[1], limits_displ[2], length.out = 6),
-                      palette = pal3,
-                      textNA = naLabel) 
+  breaks_displ <- seq(limits_displ[1], limits_displ[2], length.out = 6)
+  labels_displ <- paste0(breaks_displ[1:5], " - ", breaks_displ[2:6])
+  
+  Map3 <- BaseMap +
+    tmap::tm_polygons(fill = "displacement",
+                      fill.scale = tmap::tm_scale_intervals(
+                        n = 6,
+                        style = "fixed",
+                        breaks = breaks_displ,
+                        values = pal3,
+                        labels = labels_displ),
+                      fill.legend = tmap::tm_legend(title = displ_label)
+    )
   
   ## Fix legend positioning for plot mode
   legend.coord <- c(0.65, 0.6)
