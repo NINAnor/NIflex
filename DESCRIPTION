@@ -26,6 +26,8 @@ Imports:
     sf,
     stringr,
     tmap
+Remotes:
+    NINAnor/NIcalc
 Depends: 
     R (>= 2.10)
 LazyData: true
